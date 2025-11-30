@@ -1,0 +1,46 @@
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+}
+
+.character-list-page {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Add this to center child elements */
+}
+
+/* Override Page-Title styles for character list page */
+.character-list-page .Page-Title {
+    margin: 2rem 0 2rem 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 50px 20px;
+  font-size: 1.2rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/* Animation for loading */
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
