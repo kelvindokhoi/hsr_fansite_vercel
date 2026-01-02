@@ -1,0 +1,6 @@
+# Dependencies
+node_modules
+
+# Sensitive data
+.env
+/hsrapp_oracle_to_supabase/.env

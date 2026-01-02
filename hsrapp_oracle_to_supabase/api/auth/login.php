@@ -1,6 +1,12 @@
 <?php
 require_once '../../config/database.php';
 
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Credentials: true');
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -64,7 +70,29 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Verify password
-    if (!password_verify($password, $user['password_hash'])) {
+    $loginSuccessful = password_verify($password, $user['password_hash']);
+
+    // Log the login attempt if user_logins table exists
+    try {
+        $ip = $_SERVER['REMOTE_ADDR'] === '::1' ? '127.0.0.1' : $_SERVER['REMOTE_ADDR'];
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+        
+        $logQuery = "
+            INSERT INTO user_logins (user_id, ip_address, user_agent, login_successful)
+            VALUES (:user_id, :ip_address, :user_agent, :login_successful)
+        ";
+        $logStmt = $db->prepare($logQuery);
+        $logStmt->bindParam(":user_id", $user['id']);
+        $logStmt->bindParam(":ip_address", $ip);
+        $logStmt->bindParam(":user_agent", $ua);
+        $logStmt->bindParam(":login_successful", $loginSuccessful, PDO::PARAM_BOOL);
+        $logStmt->execute();
+    } catch (Exception $logError) {
+        // Silently fail logging if table doesn't exist or other error
+        error_log("Login logging failed: " . $logError->getMessage());
+    }
+
+    if (!$loginSuccessful) {
         http_response_code(401);
         echo json_encode(["error" => "Invalid username or password"]);
         exit();

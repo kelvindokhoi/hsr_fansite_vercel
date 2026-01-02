@@ -1,14 +1,17 @@
 <?php
 require_once '../../config/database.php';
 
-if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Credentials: true");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
     exit();
 }
 
-// ------------------------------
-// 1. Extract + validate token
-// ------------------------------
 $headers = getallheaders();
 $authorization = isset($headers['Authorization'])
     ? $headers['Authorization']
@@ -37,9 +40,6 @@ if ($decoded["exp"] < time()) {
 
 $admin_requester_id = (int)$decoded["user_id"];
 
-// ------------------------------
-// 2. Parse POST body
-// ------------------------------
 $raw = file_get_contents("php://input");
 $data = json_decode($raw, true);
 
@@ -52,9 +52,6 @@ if (!isset($data["user_id"]) || !isset($data["role_name"])) {
 $target_user_id = (int)$data["user_id"];
 $new_role_name = $data["role_name"];
 
-// ------------------------------
-// 3. DB connection
-// ------------------------------
 try {
     $database = new Database();
     $db = $database->getConnection();
@@ -63,7 +60,6 @@ try {
         throw new Exception("Database connection failed");
     }
 
-    // Fetch admin role ID dynamically
     $adminRoleQuery = "SELECT id FROM roles WHERE role_name = 'admin' LIMIT 1";
     $adminStmt = $db->prepare($adminRoleQuery);
     $adminStmt->execute();
@@ -75,7 +71,6 @@ try {
 
     $adminRoleId = $adminRole['id'];
 
-    // Fetch target role ID dynamically
     $targetRoleQuery = "SELECT id FROM roles WHERE role_name = :role_name LIMIT 1";
     $targetRoleStmt = $db->prepare($targetRoleQuery);
     $targetRoleStmt->bindParam(":role_name", $new_role_name);
@@ -90,16 +85,7 @@ try {
     $targetRole = $targetRoleStmt->fetch(PDO::FETCH_ASSOC);
     $targetRoleId = $targetRole['id'];
 
-    // ---------------------------------------
-    // 4. Make sure the requester is an admin
-    // ---------------------------------------
-    $checkAdminQuery = "
-        SELECT role_id
-        FROM users
-        WHERE id = :id
-        LIMIT 1
-    ";
-
+    $checkAdminQuery = "SELECT role_id FROM users WHERE id = :id LIMIT 1";
     $stmt = $db->prepare($checkAdminQuery);
     $stmt->bindParam(":id", $admin_requester_id);
     $stmt->execute();
@@ -118,22 +104,13 @@ try {
         exit();
     }
 
-    // Prevent an admin from demoting themselves (optional)
     if ($admin_requester_id === $target_user_id) {
         http_response_code(403);
         echo json_encode(["error" => "Admins cannot change their own role"]);
         exit();
     }
 
-    // ---------------------------------------
-    // 5. Update user role
-    // ---------------------------------------
-    $updateQuery = "
-        UPDATE users
-        SET role_id = :role_id
-        WHERE id = :id
-    ";
-
+    $updateQuery = "UPDATE users SET role_id = :role_id WHERE id = :id";
     $stmt = $db->prepare($updateQuery);
     $stmt->bindParam(":role_id", $targetRoleId, PDO::PARAM_INT);
     $stmt->bindParam(":id", $target_user_id, PDO::PARAM_INT);

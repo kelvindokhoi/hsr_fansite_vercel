@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import GachaBanner from '../components/gacha/GachaBanner';
+
 import '../css/GachaPulling.css';
 import WarpButton from '../components/gacha/WarpButton';
 import WarpResults from '../components/gacha/WarpResults';
@@ -62,12 +62,12 @@ const ITEM_DATABASE = [
   { id: 'char-5-1', name: 'Kafka', type: 'Character', rarity: 5, image: '/images/characters/kafka.png' },
   { id: 'char-5-2', name: 'Silver Wolf', type: 'Character', rarity: 5, image: '/images/characters/silver-wolf.png' },
   // Add more items...
-  
+
   // 4★ Characters
   { id: 'char-4-1', name: 'Sampo', type: 'Character', rarity: 4, image: '/images/characters/sampo.png' },
   { id: 'char-4-2', name: 'Hook', type: 'Character', rarity: 4, image: '/images/characters/hook.png' },
   // Add more items...
-  
+
   // 3★ Light Cones
   { id: 'cone-3-1', name: 'Cornucopia', type: 'Light Cone', rarity: 3, image: '/images/cones/cornucopia.png' },
   { id: 'cone-3-2', name: 'Darting Arrow', type: 'Light Cone', rarity: 3, image: '/images/cones/darting-arrow.png' },
@@ -110,7 +110,7 @@ const GachaPulling = () => {
 
   const getRandomRarity = (bannerRates) => {
     const roll = Math.random() * 100;
-    
+
     if (roll < bannerRates.fiveStar) return 5;
     if (roll < bannerRates.fiveStar + bannerRates.fourStar) return 4;
     return 3;
@@ -119,12 +119,12 @@ const GachaPulling = () => {
   const getRandomItem = (rarity, banner) => {
     // Filter items by rarity
     let eligibleItems = ITEM_DATABASE.filter(item => item.rarity === rarity);
-    
+
     // If it's a featured banner and we got a 4★ or 5★, prioritize featured items
     if (banner && rarity >= 4) {
       const featuredNames = rarity === 5 ? banner.featured.fiveStar : banner.featured.fourStar;
       const featuredItems = eligibleItems.filter(item => featuredNames.includes(item.name));
-      
+
       // If we have a guaranteed featured or a 50/50 chance for featured
       if (rarity === 5 && (pityCounters.guaranteedFeatured || Math.random() < 0.5)) {
         eligibleItems = featuredItems.length > 0 ? featuredItems : eligibleItems;
@@ -133,7 +133,7 @@ const GachaPulling = () => {
         eligibleItems = [...featuredItems, ...eligibleItems];
       }
     }
-    
+
     // Return a random item from eligible items
     return eligibleItems[Math.floor(Math.random() * eligibleItems.length)];
   };
@@ -192,22 +192,22 @@ const GachaPulling = () => {
     // Update state
     setPityCounters(newPityCounters);
     setInventory(prev => [...prev, ...results]);
-    
+
     return results;
   };
 
   const handleWarp = async (count) => {
     setIsPulling(true);
     setShowResults(false);
-    
+
     // Add a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     const results = performWarp(count);
     setWarpResults(results);
     setShowResults(true);
     setIsPulling(false);
-    
+
     // Auto-scroll to results
     setTimeout(() => {
       const resultsElement = document.querySelector('.warp-results');
@@ -252,37 +252,43 @@ const GachaPulling = () => {
       </header>
 
       <main>
-        <GachaBanner 
-          banners={BANNERS} 
-          selectedBanner={selectedBanner} 
-          onBannerSelect={handleBannerSelect} 
-        />
+        <div className="banner-selector-simple">
+          {BANNERS.map(banner => (
+            <button
+              key={banner.id}
+              className={`banner-btn ${selectedBanner?.id === banner.id ? 'active' : ''}`}
+              onClick={() => handleBannerSelect(banner)}
+            >
+              {banner.name}
+            </button>
+          ))}
+        </div>
 
         {selectedBanner && (
           <div className="warp-interface">
             <div className="pity-counters">
-              <PityCounter 
-                currentPity={pityCounters.fiveStar} 
-                pityType="5★" 
-                maxPity={90} 
+              <PityCounter
+                currentPity={pityCounters.fiveStar}
+                pityType="5★"
+                maxPity={90}
               />
-              <PityCounter 
-                currentPity={pityCounters.fourStar} 
-                pityType="4★" 
-                maxPity={10} 
+              <PityCounter
+                currentPity={pityCounters.fourStar}
+                pityType="4★"
+                maxPity={10}
               />
             </div>
 
             <div className="warp-buttons">
-              <WarpButton 
-                onWarp={() => handleWarp(1)} 
-                warpType="single" 
+              <WarpButton
+                onWarp={() => handleWarp(1)}
+                warpType="single"
                 disabled={isPulling}
                 loading={isPulling}
               />
-              <WarpButton 
-                onWarp={() => handleWarp(10)} 
-                warpType="ten" 
+              <WarpButton
+                onWarp={() => handleWarp(10)}
+                warpType="ten"
                 disabled={isPulling}
                 loading={isPulling}
               />
@@ -291,22 +297,22 @@ const GachaPulling = () => {
         )}
 
         {showResults && warpResults.length > 0 && (
-          <WarpResults 
-            results={warpResults} 
-            isNewPity={warpResults.some(item => item.isPity)} 
+          <WarpResults
+            results={warpResults}
+            isNewPity={warpResults.some(item => item.isPity)}
           />
         )}
 
-        <Inventory 
-          items={inventory} 
-          onFilterChange={handleFilterChange} 
-          activeFilter={inventoryFilter} 
+        <Inventory
+          items={inventory}
+          onFilterChange={handleFilterChange}
+          activeFilter={inventoryFilter}
         />
       </main>
 
       <footer className="gacha-footer">
-        <button 
-          className="reset-button" 
+        <button
+          className="reset-button"
           onClick={resetAccount}
           title="Reset all progress"
         >

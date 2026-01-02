@@ -1,34 +1,50 @@
-import React from 'react';
+// src/components/gacha/GachaBanner.jsx
+import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
 
-const GachaBanner = ({ banners = [], selectedBanner, onBannerSelect }) => {
+export default function GachaBanner({ bannerType, onPull }) {
+  const { user } = useAuth();
+  const [isPulling, setIsPulling] = useState(false);
+
+  const handlePull = async () => {
+    if (!user) {
+      alert('Please sign in to pull');
+      return;
+    }
+
+    setIsPulling(true);
+    try {
+      // Save pull to Supabase
+      const { data, error } = await supabase
+        .from('gacha_pulls')
+        .insert([
+          { 
+            user_id: user.id,
+            banner_type: bannerType,
+            pull_time: new Date().toISOString()
+          }
+        ])
+        .select();
+
+      if (error) throw error;
+
+      // Call the original onPull with the new pull data
+      onPull(data[0]);
+    } catch (error) {
+      console.error('Error saving pull:', error);
+    } finally {
+      setIsPulling(false);
+    }
+  };
+
   return (
-    <div className="banner-container">
-      <h2>Select a Banner</h2>
-      <div className="banner-options">
-        {banners.map((banner) => (
-          <div 
-            key={banner.id}
-            className={`banner-option ${selectedBanner?.id === banner.id ? 'active' : ''}`}
-            onClick={() => onBannerSelect(banner)}
-          >
-            <img 
-              src={banner.image} 
-              alt={banner.name} 
-              className="banner-image"
-            />
-            <div className="banner-info">
-              <h3>{banner.name}</h3>
-              <p>{banner.description}</p>
-              <div className="banner-rates">
-                <span>5★: {banner.rates.fiveStar}%</span>
-                <span>4★: {banner.rates.fourStar}%</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <button
+      onClick={handlePull}
+      disabled={isPulling}
+      className="px-6 py-3 bg-purple-600 text-white rounded-lg disabled:opacity-50"
+    >
+      {isPulling ? 'Pulling...' : `Pull on ${bannerType} Banner`}
+    </button>
   );
-};
-
-export default GachaBanner;
+}

@@ -1,6 +1,12 @@
 <?php
 require_once '../../config/database.php';
 
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Credentials: true');
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -70,10 +76,11 @@ try {
     // Hash password
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert new user with role_id
+    // Insert new user with role_id using RETURNING for PostgreSQL
     $insertQuery = "
         INSERT INTO users (username, password_hash, stellar_jade_balance, role_id)
         VALUES (:username, :password_hash, :balance, :role_id)
+        RETURNING id
     ";
 
     $stmt = $db->prepare($insertQuery);
@@ -84,7 +91,8 @@ try {
     $stmt->bindParam(":role_id", $defaultRoleId);
 
     if ($stmt->execute()) {
-        $user_id = $db->lastInsertId();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user_id = $user['id'];
 
         // Build token
         $token = base64_encode(json_encode([

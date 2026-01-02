@@ -1,15 +1,5 @@
 <?php
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+require_once '../../config/database.php';
 
 // Get token from Authorization header
 $headers = getallheaders();
@@ -25,8 +15,21 @@ if (empty($authorization)) {
 
 $token = str_replace('Bearer ', '', $authorization);
 
-// Verify the token using your existing verify endpoint
-$verifyUrl = 'http://localhost/hsrapp/api/auth/verify.php';
+// Determine verify URL based on current server path
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+$host = $_SERVER['HTTP_HOST'];
+$currentPath = $_SERVER['REQUEST_URI'];
+$apiBase = str_replace('management/getCharacter.php', '', $currentPath);
+$verifyUrl = "$protocol://$host{$apiBase}auth/verify.php";
+
+// Fallback to localhost if external host fails (sometimes Oracle needs localhost for internal calls)
+if (strpos($host, 'localhost') === false) {
+    // Attempt with localhost for internal performance
+    $localVerifyUrl = "http://localhost{$apiBase}auth/verify.php";
+} else {
+    $localVerifyUrl = $verifyUrl;
+}
+
 $options = [
     'http' => [
         'header' => "Authorization: Bearer $token\r\n",
@@ -34,11 +37,19 @@ $options = [
     ]
 ];
 $context = stream_context_create($options);
-$verifyResponse = file_get_contents($verifyUrl, false, $context);
+$verifyResponse = @file_get_contents($localVerifyUrl, false, $context);
+
+// If local fails, try the absolute URL
+if ($verifyResponse === FALSE) {
+    $verifyResponse = @file_get_contents($verifyUrl, false, $context);
+}
 
 if ($verifyResponse === FALSE) {
     http_response_code(401);
-    echo json_encode(["error" => "Token verification failed"]);
+    echo json_encode([
+        "error" => "Token verification failed",
+        "debug" => ["verifyUrl" => $verifyUrl, "localVerifyUrl" => $localVerifyUrl]
+    ]);
     exit();
 }
 
@@ -51,8 +62,6 @@ if (!$verifyData || !isset($verifyData['user'])) {
 }
 
 // Token is valid, proceed with database operations
-require_once '../../config/database.php';
-
 // Create connection
 $database = new Database();
 $db = $database->getConnection();

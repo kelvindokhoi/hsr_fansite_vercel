@@ -1,133 +1,134 @@
+// src/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const AuthContext = createContext({});
 
-const API_URL = 'http://localhost/hsrapp/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/hsrapp/api';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      verifyToken(storedToken);
-    } else {
-      setLoading(false);
-    }
-  }, []);
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
 
-  const verifyToken = async (token) => {
-    if (!token) {
-      console.log('No token found');
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      console.log('Verifying token...');
-      const response = await axios.get(`${API_URL}/auth/verify.php`, {
-        headers: { Authorization: `Bearer ${token}` },
-        timeout: 5000 // 5 second timeout
-      });
-      
-      if (response.data && response.data.user) {
-        console.log('Token verification successful');
-        setUser(response.data.user);
-        setToken(token);
-        // Ensure token is stored
-        localStorage.setItem('token', token);
-      } else {
-        console.error('Invalid token response format');
+      try {
+        const response = await axios.get(`${API_URL}/auth/verify.php`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.data.user) {
+          setUser(response.data.user);
+        } else {
+          localStorage.removeItem('token');
+          setUser(null);
+        }
+      } catch (err) {
+        console.error('Auth verification failed:', err);
         localStorage.removeItem('token');
         setUser(null);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Token verification failed:', error.message);
-      if (error.response) {
-        console.error('Response status:', error.response.status);
-        console.error('Response data:', error.response.data);
-        if (error.response.status === 401) {
-          console.log('Token expired or invalid');
-        }
-      } else if (error.request) {
-        console.error('No response received:', error.request);
-      } else {
-        console.error('Error setting up request:', error.message);
-      }
-      localStorage.removeItem('token');
-      setUser(null);
-    } finally {
-      console.log('Auth loading complete');
-      setLoading(false);
-    }
-  };
+    };
+
+    checkAuth();
+  }, []);
 
   const login = async (username, password) => {
     try {
       setError('');
       const response = await axios.post(`${API_URL}/auth/login.php`, {
-        username: username.trim(),
-        password: password
-      }, {
-        timeout: 10000 // 10 second timeout
+        username,
+        password
       });
-      
-      if (response.data && response.data.token && response.data.user) {
-        const { token, user } = response.data;
-        localStorage.setItem('token', token);
-        setToken(token);
-        setUser(user);
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        setUser(response.data.user);
         return { success: true };
       } else {
-        throw new Error('Invalid response format from server');
+        throw new Error(response.data.error || 'Login failed');
       }
-    } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.error || 'Login failed'
-      };
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.message || 'Login failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     }
   };
 
   const register = async (username, password) => {
     try {
+      setError('');
       const response = await axios.post(`${API_URL}/auth/register.php`, {
         username,
         password
       });
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data.user);
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.error || 'Registration failed'
-      };
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        setUser(response.data.user);
+        return { success: true };
+      } else {
+        throw new Error(response.data.error || 'Registration failed');
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.message || 'Registration failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem('token');
     setUser(null);
+    navigate('/login');
   };
 
-  return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  // Keep these for backward compatibility if needed, but they might need PHP implementation
+  const resetPassword = async (email) => {
+    setError('Reset password not implemented in PHP backend yet.');
+    return { success: false, error: 'Not implemented' };
+  };
+
+  const updateProfile = async (updates) => {
+    setError('Update profile not implemented in PHP backend yet.');
+    return { success: false, error: 'Not implemented' };
+  };
+
+  const value = {
+    user,
+    loading,
+    error,
+    login,
+    register,
+    logout,
+    signIn: login, // Alises for compatibility
+    signUp: register,
+    signOut: logout,
+    resetPassword,
+    updateProfile
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

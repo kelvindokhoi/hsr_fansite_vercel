@@ -9,7 +9,7 @@ import HSRLogoEvernight from '../assets/HSR_Logo_Evernight.png';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
 import '../css/CharacterListPage.css';
 
-const API_URL = 'http://localhost/hsrapp/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/hsrapp/api';
 
 const CharacterListPage = () => {
   const [characters, setCharacters] = useState([]);
