@@ -5,7 +5,7 @@ import PillNav from '../components/PillNav';
 import GradientText from '../components/GradientText';
 import UserMenu from '../components/UserMenu';
 import HSRLogoKafka from '../assets/HSR_Logo_Kafka.png';
-import HSRLogoPompom from '../assets/HSR_Logo_Pompom.png';
+import HSRLogoPomPom from '../assets/HSR_Logo_PomPom.png';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
 import '../css/WarpSimulator.css';
 
@@ -13,7 +13,7 @@ const WarpSimulator = () => {
   return (
     <div className="warp-simulator-page">
       <PillNav
-        logo={HSRLogoPompom}
+        logo={HSRLogoPomPom}
         logoAlt="Honkai: Star Rail Logo"
         items={[
           { label: 'Home', href: '/' },

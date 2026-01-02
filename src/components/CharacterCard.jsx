@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/CharacterCard.css';
 
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || '';
 const CharacterCard = ({ character }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [portraitPath, setPortraitPath] = useState('');
@@ -16,96 +17,96 @@ const CharacterCard = ({ character }) => {
 
   const rarityClass = character.rarity === 5 ? 'five-star' : 'four-star';
 
-const getFallbackPath = (type) => {
-  switch(type) {
-    case 'portrait':
-      return '/images/placeholder_portrait.png';
-    case 'avatar':
-      return '/images/placeholder_avatar.png';
-    default:
-      return '/images/Unknown.png';
-  }
-};
-
-const getImagePath = (baseName, type) => {
-  return new Promise((resolve) => {
-    const extensions = ['png', 'jpg'];
-    let currentIndex = 0;
-
-    const tryNext = async () => {
-      if (currentIndex >= extensions.length) {
-        console.log(`No valid image found for ${baseName}_${type}, using fallback`);
-        resolve(getFallbackPath(type));
-        return;
-      }
-
-      const ext = extensions[currentIndex++];
-      // URL encode the path but keep the forward slashes
-      const path = `/images/${encodeURIComponent(baseName)}_${type}.${ext}`.replace(/%2F/g, '/');
-      console.log(`Trying to load: ${path}`);
-
-      try {
-        const img = new Image();
-        const timeout = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('timeout')), 1000)
-        );
-
-        const loadImage = new Promise((resolve, reject) => {
-          img.onload = () => resolve(path);
-          img.onerror = () => reject(new Error('load error'));
-          img.src = path;
-        });
-
-        const result = await Promise.race([loadImage, timeout]);
-        console.log(`Found image at: ${result}`);
-        resolve(result);
-      } catch (error) {
-        console.log(`Failed to load: ${path} - ${error.message}`);
-        tryNext();
-      }
-    };
-
-    tryNext();
-  });
-};
-useEffect(() => {
-  let isMounted = true;
-  const abortController = new AbortController();
-
-  const loadImages = async () => {
-    try {
-      setIsLoading(true);
-      const [portrait, avatar] = await Promise.all([
-        getImagePath(character.imageName, 'portrait'),
-        getImagePath(character.imageName, 'avatar')
-      ]);
-
-      if (isMounted) {
-        setPortraitPath(portrait);
-        setAvatarPath(avatar);
-        setElementPath(`/images/${character.element}.png`);
-      }
-    } catch (error) {
-      console.error('Error loading images:', error);
-      if (isMounted) {
-        setPortraitPath('/images/placeholder_portrait.png');
-        setAvatarPath('/images/placeholder_avatar.png');
-        setElementPath('/images/Unknown.png');
-      }
-    } finally {
-      if (isMounted) {
-        setIsLoading(false);
-      }
+  const getFallbackPath = (type) => {
+    switch (type) {
+      case 'portrait':
+        return `${IMAGE_BASE_URL}/images/placeholder_portrait.png`;
+      case 'avatar':
+        return `${IMAGE_BASE_URL}/images/placeholder_avatar.png`;
+      default:
+        return `${IMAGE_BASE_URL}/images/Unknown.png`;
     }
   };
 
-  loadImages();
+  const getImagePath = (baseName, type) => {
+    return new Promise((resolve) => {
+      const extensions = ['png', 'jpg'];
+      let currentIndex = 0;
 
-  return () => {
-    isMounted = false;
-    abortController.abort();
+      const tryNext = async () => {
+        if (currentIndex >= extensions.length) {
+          console.log(`No valid image found for ${baseName}_${type}, using fallback`);
+          resolve(getFallbackPath(type));
+          return;
+        }
+
+        const ext = extensions[currentIndex++];
+        // URL encode the path but keep the forward slashes
+        const path = `${IMAGE_BASE_URL}/images/${encodeURIComponent(baseName)}_${type}.${ext}`.replace(/%2F/g, '/');
+        console.log(`Trying to load: ${path}`);
+
+        try {
+          const img = new Image();
+          const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), 1000)
+          );
+
+          const loadImage = new Promise((resolve, reject) => {
+            img.onload = () => resolve(path);
+            img.onerror = () => reject(new Error('load error'));
+            img.src = path;
+          });
+
+          const result = await Promise.race([loadImage, timeout]);
+          console.log(`Found image at: ${result}`);
+          resolve(result);
+        } catch (error) {
+          console.log(`Failed to load: ${path} - ${error.message}`);
+          tryNext();
+        }
+      };
+
+      tryNext();
+    });
   };
-}, [character.imageName, character.element]);
+  useEffect(() => {
+    let isMounted = true;
+    const abortController = new AbortController();
+
+    const loadImages = async () => {
+      try {
+        setIsLoading(true);
+        const [portrait, avatar] = await Promise.all([
+          getImagePath(character.imageName, 'portrait'),
+          getImagePath(character.imageName, 'avatar')
+        ]);
+
+        if (isMounted) {
+          setPortraitPath(portrait);
+          setAvatarPath(avatar);
+          setElementPath(`${IMAGE_BASE_URL}/images/${character.element}.png`);
+        }
+      } catch (error) {
+        console.error('Error loading images:', error);
+        if (isMounted) {
+          setPortraitPath(`${IMAGE_BASE_URL}/images/placeholder_portrait.png`);
+          setAvatarPath(`${IMAGE_BASE_URL}/images/placeholder_avatar.png`);
+          setElementPath(`${IMAGE_BASE_URL}/images/Unknown.png`);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadImages();
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
+  }, [character.imageName, character.element]);
 
   if (isLoading) {
     return <div className="character-card loading">Loading...</div>;
@@ -128,7 +129,7 @@ useEffect(() => {
           className="element-icon"
           loading="lazy"
           onError={(e) => {
-            e.target.src = '/images/Unknown.png';
+            e.target.src = `${IMAGE_BASE_URL}/images/Unknown.png`;
           }}
         />
 
@@ -138,7 +139,7 @@ useEffect(() => {
           className="portrait-image"
           loading="lazy"
           onError={(e) => {
-            e.target.src = '/images/placeholder_portrait.png';
+            e.target.src = `${IMAGE_BASE_URL}/images/placeholder_portrait.png`;
           }}
         />
 
@@ -156,7 +157,7 @@ useEffect(() => {
               className="avatar-image"
               loading="lazy"
               onError={(e) => {
-                e.target.src = '/images/placeholder_avatar.png';
+                e.target.src = `${IMAGE_BASE_URL}/images/placeholder_avatar.png`;
               }}
             />
             <div className="tooltip-name-rarity">
@@ -173,7 +174,7 @@ useEffect(() => {
               alt={`${character.element} element`}
               className="tooltip-element"
               onError={(e) => {
-                e.target.src = '/images/Unknown.png';
+                e.target.src = `${IMAGE_BASE_URL}/images/Unknown.png`;
               }}
             />
             <span className="tooltip-path-text">{character.path}</span>

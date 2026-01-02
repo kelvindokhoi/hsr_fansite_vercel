@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import CharacterCard from './CharacterCard';
 import '../css/CharacterList.css';
 
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || '';
 const CharacterList = ({ characters }) => {
   const [activeFilters, setActiveFilters] = useState({
     elements: [],
@@ -24,19 +25,19 @@ const CharacterList = ({ characters }) => {
     return characters.filter(char => {
       // Search filter (case insensitive)
       if (activeFilters.search &&
-          !char.name.toLowerCase().includes(activeFilters.search.toLowerCase())) {
+        !char.name.toLowerCase().includes(activeFilters.search.toLowerCase())) {
         return false;
       }
 
       // Element filter
       if (activeFilters.elements.length > 0 &&
-          !activeFilters.elements.includes(char.element)) {
+        !activeFilters.elements.includes(char.element)) {
         return false;
       }
 
       // Path filter
       if (activeFilters.paths.length > 0 &&
-          !activeFilters.paths.includes(char.path)) {
+        !activeFilters.paths.includes(char.path)) {
         return false;
       }
 
@@ -125,7 +126,7 @@ const CharacterList = ({ characters }) => {
                 aria-pressed={activeFilters.elements.includes(element)}
               >
                 <img
-                  src={`/images/${element}.png`}
+                  src={`${IMAGE_BASE_URL}/images/${element}.png`}
                   alt={`${element} element`}
                   className="filter-icon"
                 />
