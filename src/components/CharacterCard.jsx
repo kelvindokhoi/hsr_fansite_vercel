@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../css/CharacterCard.css';
 
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || '';
+
 const CharacterCard = ({ character }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [portraitPath, setPortraitPath] = useState('');
@@ -41,9 +42,7 @@ const CharacterCard = ({ character }) => {
         }
 
         const ext = extensions[currentIndex++];
-        // URL encode the path but keep the forward slashes
-        const path = `${IMAGE_BASE_URL}/images/${encodeURIComponent(baseName)}_${type}.${ext}`.replace(/%2F/g, '/');
-        console.log(`Trying to load: ${path}`);
+        const path = `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`;
 
         try {
           const img = new Image();
@@ -58,10 +57,8 @@ const CharacterCard = ({ character }) => {
           });
 
           const result = await Promise.race([loadImage, timeout]);
-          console.log(`Found image at: ${result}`);
           resolve(result);
         } catch (error) {
-          console.log(`Failed to load: ${path} - ${error.message}`);
           tryNext();
         }
       };
@@ -69,6 +66,7 @@ const CharacterCard = ({ character }) => {
       tryNext();
     });
   };
+
   useEffect(() => {
     let isMounted = true;
     const abortController = new AbortController();

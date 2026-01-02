@@ -9,6 +9,10 @@
       "destination": "http://141.148.87.253/images/:path*"
     },
     {
+      "source": "/audio/:path*",
+      "destination": "http://141.148.87.253/audio/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

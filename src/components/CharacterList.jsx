@@ -3,6 +3,7 @@ import CharacterCard from './CharacterCard';
 import '../css/CharacterList.css';
 
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || '';
+
 const CharacterList = ({ characters }) => {
   const [activeFilters, setActiveFilters] = useState({
     elements: [],
@@ -12,6 +13,7 @@ const CharacterList = ({ characters }) => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const charactersPerPage = 50;
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   // Get unique elements and paths for filter buttons
   const elements = useMemo(() =>
@@ -109,79 +111,88 @@ const CharacterList = ({ characters }) => {
 
   // Available elements and paths for filtering
   const availableElements = ['Fire', 'Ice', 'Imaginary', 'Lightning', 'Physical', 'Quantum', 'Wind'];
-  const availablePaths = ['Abundance', 'Destruction', 'Erudition', 'Harmony', 'Nihility', 'Preservation', 'The Hunt'];
+  const availablePaths = ['Abundance', 'Destruction', 'Erudition', 'Harmony', 'Nihility', 'Preservation', 'Hunt', 'Remembrance'];
 
   return (
     <div className="character-list-container">
       {/* Filter Controls */}
-      <div className="filter-controls">
-        <div className="filter-group">
-          <h3>Element</h3>
-          <div className="filter-buttons">
-            {availableElements.map(element => (
-              <button
-                key={element}
-                className={`filter-button ${activeFilters.elements.includes(element) ? 'active' : ''}`}
-                onClick={() => toggleElement(element)}
-                aria-pressed={activeFilters.elements.includes(element)}
-              >
-                <img
-                  src={`${IMAGE_BASE_URL}/images/${element}.png`}
-                  alt={`${element} element`}
-                  className="filter-icon"
-                />
-              </button>
-            ))}
+      <div className={`filter-controls ${!filtersExpanded ? 'collapsed' : ''}`}>
+        <div className="filter-header" onClick={() => setFiltersExpanded(!filtersExpanded)}>
+          <h3>Filters & Search</h3>
+          <span className={`collapse-icon ${filtersExpanded ? 'expanded' : 'collapsed'}`}>▼</span>
+        </div>
+
+        {filtersExpanded && (
+          <div className="filter-content">
+            <div className="filter-group">
+              <h3>Element</h3>
+              <div className="filter-buttons">
+                {availableElements.map(element => (
+                  <button
+                    key={element}
+                    className={`filter-button ${activeFilters.elements.includes(element) ? 'active' : ''}`}
+                    onClick={() => toggleElement(element)}
+                    aria-pressed={activeFilters.elements.includes(element)}
+                  >
+                    <img
+                      src={`${IMAGE_BASE_URL}/images/${element}.png`}
+                      alt={`${element} element`}
+                      className="filter-icon"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <h3>Path</h3>
+              <div className="filter-buttons">
+                {availablePaths.map(path => (
+                  <button
+                    key={path}
+                    className={`filter-button ${activeFilters.paths.includes(path) ? 'active' : ''}`}
+                    onClick={() => togglePath(path)}
+                    aria-pressed={activeFilters.paths.includes(path)}
+                  >
+                    {path}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <h3>Rarity</h3>
+              <div className="filter-buttons">
+                {[4, 5].map(rarity => (
+                  <button
+                    key={rarity}
+                    className={`filter-button ${activeFilters.rarities.includes(rarity) ? 'active' : ''}`}
+                    onClick={() => toggleRarity(rarity)}
+                    aria-pressed={activeFilters.rarities.includes(rarity)}
+                  >
+                    {Array(rarity).fill('★').join('')}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group search-group">
+              <h3>Search</h3>
+              <input
+                type="text"
+                placeholder="Character name..."
+                value={activeFilters.search}
+                onChange={handleSearch}
+                className="search-input"
+                aria-label="Search characters by name"
+              />
+            </div>
+
+            <button onClick={resetFilters} className="reset-button">
+              Reset Filters
+            </button>
           </div>
-        </div>
-
-        <div className="filter-group">
-          <h3>Path</h3>
-          <div className="filter-buttons">
-            {availablePaths.map(path => (
-              <button
-                key={path}
-                className={`filter-button ${activeFilters.paths.includes(path) ? 'active' : ''}`}
-                onClick={() => togglePath(path)}
-                aria-pressed={activeFilters.paths.includes(path)}
-              >
-                {path}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-group">
-          <h3>Rarity</h3>
-          <div className="filter-buttons">
-            {[4, 5].map(rarity => (
-              <button
-                key={rarity}
-                className={`filter-button ${activeFilters.rarities.includes(rarity) ? 'active' : ''}`}
-                onClick={() => toggleRarity(rarity)}
-                aria-pressed={activeFilters.rarities.includes(rarity)}
-              >
-                {Array(rarity).fill('★').join('')}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-group search-group">
-          <h3>Search</h3>
-          <input
-            type="text"
-            placeholder="Character name..."
-            value={activeFilters.search}
-            onChange={handleSearch}
-            className="search-input"
-            aria-label="Search characters by name"
-          />
-        </div>
-
-        <button onClick={resetFilters} className="reset-button">
-          Reset Filters
-        </button>
+        )}
       </div>
 
       {/* Results Count */}

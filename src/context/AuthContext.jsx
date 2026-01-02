@@ -1,134 +1,119 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext({});
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/hsrapp/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      verifyToken(storedToken);
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
-      try {
-        const response = await axios.get(`${API_URL}/auth/verify.php`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+  const verifyToken = async (token) => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-        if (response.data.user) {
-          setUser(response.data.user);
-        } else {
-          localStorage.removeItem('token');
-          setUser(null);
-        }
-      } catch (err) {
-        console.error('Auth verification failed:', err);
+    try {
+      const response = await axios.get(`${API_URL}/auth/verify.php`, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 5000
+      });
+
+      if (response.data && response.data.user) {
+        setUser(response.data.user);
+        setToken(token);
+        localStorage.setItem('token', token);
+      } else {
         localStorage.removeItem('token');
         setUser(null);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    checkAuth();
-  }, []);
+    } catch (error) {
+      localStorage.removeItem('token');
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const login = async (username, password) => {
     try {
       setError('');
       const response = await axios.post(`${API_URL}/auth/login.php`, {
-        username,
-        password
+        username: username.trim(),
+        password: password
+      }, {
+        timeout: 10000
       });
 
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        setUser(response.data.user);
+      if (response.data && response.data.token && response.data.user) {
+        const { token, user } = response.data;
+        localStorage.setItem('token', token);
+        setToken(token);
+        setUser(user);
         return { success: true };
       } else {
-        throw new Error(response.data.error || 'Login failed');
+        throw new Error('Invalid response format from server');
       }
-    } catch (err) {
-      const errorMessage = err.response?.data?.error || err.message || 'Login failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Login failed'
+      };
     }
   };
 
   const register = async (username, password) => {
     try {
-      setError('');
       const response = await axios.post(`${API_URL}/auth/register.php`, {
         username,
         password
       });
-
-      if (response.data.token) {
+      if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
         setUser(response.data.user);
         return { success: true };
-      } else {
-        throw new Error(response.data.error || 'Registration failed');
       }
-    } catch (err) {
-      const errorMessage = err.response?.data?.error || err.message || 'Registration failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+      return { success: false, error: 'Registration succeeded but no token returned' };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Registration failed'
+      };
     }
   };
 
-  const logout = async () => {
+  const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
     navigate('/login');
   };
 
-  // Keep these for backward compatibility if needed, but they might need PHP implementation
-  const resetPassword = async (email) => {
-    setError('Reset password not implemented in PHP backend yet.');
-    return { success: false, error: 'Not implemented' };
-  };
-
-  const updateProfile = async (updates) => {
-    setError('Update profile not implemented in PHP backend yet.');
-    return { success: false, error: 'Not implemented' };
-  };
-
-  const value = {
-    user,
-    loading,
-    error,
-    login,
-    register,
-    logout,
-    signIn: login, // Alises for compatibility
-    signUp: register,
-    signOut: logout,
-    resetPassword,
-    updateProfile
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
 };

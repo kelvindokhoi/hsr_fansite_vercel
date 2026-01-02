@@ -9,7 +9,7 @@ import HSRLogoEvernight from '../assets/HSR_Logo_Evernight.png';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
 import '../css/CharacterListPage.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/hsrapp/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const CharacterListPage = () => {
   const [characters, setCharacters] = useState([]);
@@ -17,11 +17,11 @@ const CharacterListPage = () => {
   const [error, setError] = useState(null);
   const { user, loading: authLoading } = useAuth();
 
-  // Define navigation items
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Character List', href: '/character-list' },
+    { label: 'Edit Characters', href: '/edit-characters' },
     { label: 'Gacha Pulling', href: '/gacha-pulling' },
     { label: 'Credits', href: '/credits' }
   ];
@@ -31,7 +31,7 @@ const CharacterListPage = () => {
       try {
         setIsLoading(true);
         const token = localStorage.getItem('token');
-        
+
         if (!token) {
           setError('Please log in to view characters');
           setIsLoading(false);
@@ -58,7 +58,9 @@ const CharacterListPage = () => {
       }
     };
 
-    fetchCharacters();
+    if (user) {
+      fetchCharacters();
+    }
   }, [user]);
 
   if (authLoading || isLoading) {

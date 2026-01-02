@@ -1,15 +1,38 @@
 // src/pages/WarpSimulator.jsx
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PillNav from '../components/PillNav';
 import GradientText from '../components/GradientText';
-import UserMenu from '../components/UserMenu';
 import HSRLogoKafka from '../assets/HSR_Logo_Kafka.png';
 import HSRLogoPomPom from '../assets/HSR_Logo_PomPom.png';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
 import '../css/WarpSimulator.css';
 
 const WarpSimulator = () => {
+  const containerRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   return (
     <div className="warp-simulator-page">
       <PillNav
@@ -19,7 +42,8 @@ const WarpSimulator = () => {
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },
           { label: 'Character List', href: '/character-list' },
-          { label: 'Warp Simulator', href: '/warp-simulator' },
+          { label: 'Edit Characters', href: '/edit-characters' },
+          { label: 'Gacha Pulling', href: '/gacha-pulling' },
           { label: 'Credits', href: '/credits' }
         ]}
         activeHref="/warp-simulator"
@@ -43,7 +67,32 @@ const WarpSimulator = () => {
         </div>
 
         <div className="warp-content">
-          <div className="warp-frame-container">
+          <div className="warp-frame-container" ref={containerRef}>
+            <div className="warp-controls">
+              <span className="warp-controls-title">Warp Simulator</span>
+              <button
+                className="fullscreen-toggle"
+                onClick={toggleFullScreen}
+                aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              >
+                {isFullscreen ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+                    </svg>
+                    <span>Exit Fullscreen</span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                    </svg>
+                    <span>Fullscreen</span>
+                  </>
+                )}
+              </button>
+            </div>
             <iframe
               id="warp-simulator-iframe"
               src="https://hsr.wishsimulator.app/"

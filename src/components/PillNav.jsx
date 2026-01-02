@@ -1,15 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import UserMenu from './UserMenu';
 import { useAuth } from '../context/AuthContext';
-import PropTypes from 'prop-types'; // Add PropTypes
-import '/src/css/PillNav.css';
+import PropTypes from 'prop-types';
+import '../css/PillNav.css';
+
+const clickSound = new Audio('/audio/mixkit-modern-technology-select-3124.wav');
 
 const PillNav = ({
   logo,
   logoAlt = 'Logo',
-  items = [], // Default empty array
+  items = [],
   activeHref,
   className = '',
   ease = 'power3.easeOut',
@@ -20,6 +22,14 @@ const PillNav = ({
   onMobileMenuClick,
   initialLoadAnimation = true
 }) => {
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const handleItemClick = () => {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(err => console.log('Click sound prevented:', err));
+  };
+  const [prevScrollPos, setPrevScrollPos] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const containerRef = useRef(null);
   const resolvedPillTextColor = pillTextColor ?? baseColor;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const circleRefs = useRef([]);
@@ -31,6 +41,25 @@ const PillNav = ({
   const mobileMenuRef = useRef(null);
   const navItemsRef = useRef(null);
   const logoRef = useRef(null);
+
+  const handleScroll = useCallback(() => {
+    const currentScrollPos = window.pageYOffset;
+    const isVisible = prevScrollPos > currentScrollPos || currentScrollPos < 10;
+
+    setVisible(isVisible);
+    setPrevScrollPos(currentScrollPos);
+
+    if (containerRef.current) {
+      containerRef.current.style.transform = isVisible
+        ? 'translateY(0)'
+        : `translateY(-${containerRef.current.offsetHeight}px)`;
+    }
+  }, [prevScrollPos]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   useEffect(() => {
     const layout = () => {
@@ -77,7 +106,7 @@ const PillNav = ({
     window.addEventListener('resize', onResize);
 
     if (document.fonts?.ready) {
-      document.fonts.ready.then(layout).catch(() => {});
+      document.fonts.ready.then(layout).catch(() => { });
     }
 
     const menu = mobileMenuRef.current;
@@ -85,7 +114,7 @@ const PillNav = ({
       gsap.set(menu, { visibility: 'hidden', opacity: 0, scaleY: 1 });
     }
 
-    if (initialLoadAnimation) {
+    if (initialLoadAnimation && !hasAnimated) {
       const logo = logoRef.current;
       const navItems = navItemsRef.current;
       if (logo) {
@@ -104,10 +133,11 @@ const PillNav = ({
           ease
         });
       }
+      setHasAnimated(true);
     }
 
     return () => window.removeEventListener('resize', onResize);
-  }, [items, ease, initialLoadAnimation]);
+  }, [items, ease, initialLoadAnimation, hasAnimated]);
 
   const handleEnter = i => {
     const tl = tlRefs.current[i];
@@ -207,21 +237,18 @@ const PillNav = ({
     ['--base']: baseColor,
     ['--pill-bg']: pillColor,
     ['--hover-text']: hoveredPillTextColor,
-    ['--pill-text']: resolvedPillTextColor
+    ['--pill-text']: resolvedPillTextColor,
   };
 
-  const { user } = useAuth();
-
   return (
-    <div className="pill-nav-container">
-      <nav className={`pill-nav ${className}`} aria-label="Primary" style={cssVars}>
-        {isRouterLink(items?.[0]?.href) ? ( // Optional chaining for safety
+    <div className={`pill-nav-container ${className}`} ref={containerRef}>
+      <nav className="pill-nav" style={cssVars}>
+        {isRouterLink(items?.[0]?.href) ? (
           <Link
             className="pill-logo"
-            to={items[0]?.href || '#'} // Fallback to '#' if undefined
+            to={items?.[0]?.href || '#'}
             aria-label="Home"
             onMouseEnter={handleLogoEnter}
-            role="menuitem"
             ref={el => {
               logoRef.current = el;
             }}
@@ -231,7 +258,7 @@ const PillNav = ({
         ) : (
           <a
             className="pill-logo"
-            href={items?.[0]?.href || '#'} // Fallback to '#' if undefined
+            href={items?.[0]?.href || '#'}
             aria-label="Home"
             onMouseEnter={handleLogoEnter}
             ref={el => {
@@ -244,16 +271,17 @@ const PillNav = ({
 
         <div className="pill-nav-items desktop-only" ref={navItemsRef}>
           <ul className="pill-list" role="menubar">
-            {items?.map((item, i) => ( // Optional chaining here
+            {items?.map((item, i) => (
               <li key={item.href || `item-${i}`} role="none">
                 {isRouterLink(item.href) ? (
                   <Link
                     role="menuitem"
-                    to={item.href || '#'} // Fallback to '#' if undefined
+                    to={item.href || '#'}
                     className={`pill${activeHref === item.href ? ' is-active' : ''}`}
                     aria-label={item.ariaLabel || item.label}
                     onMouseEnter={() => handleEnter(i)}
                     onMouseLeave={() => handleLeave(i)}
+                    onClick={handleItemClick}
                   >
                     <span
                       className="hover-circle"
@@ -272,11 +300,12 @@ const PillNav = ({
                 ) : (
                   <a
                     role="menuitem"
-                    href={item.href || '#'} // Fallback to '#' if undefined
+                    href={item.href || '#'}
                     className={`pill${activeHref === item.href ? ' is-active' : ''}`}
                     aria-label={item.ariaLabel || item.label}
                     onMouseEnter={() => handleEnter(i)}
                     onMouseLeave={() => handleLeave(i)}
+                    onClick={handleItemClick}
                   >
                     <span
                       className="hover-circle"
@@ -315,21 +344,21 @@ const PillNav = ({
 
       <div className="mobile-menu-popover mobile-only" ref={mobileMenuRef} style={cssVars}>
         <ul className="mobile-menu-list">
-          {items?.map((item, i) => ( // Optional chaining here
+          {items?.map((item, i) => (
             <li key={item.href || `mobile-item-${i}`}>
               {isRouterLink(item.href) ? (
                 <Link
-                  to={item.href || '#'} // Fallback to '#' if undefined
+                  to={item.href || '#'}
                   className={`mobile-menu-link${activeHref === item.href ? ' is-active' : ''}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => { setIsMobileMenuOpen(false); handleItemClick(); }}
                 >
                   {item.label}
                 </Link>
               ) : (
                 <a
-                  href={item.href || '#'} // Fallback to '#' if undefined
+                  href={item.href || '#'}
                   className={`mobile-menu-link${activeHref === item.href ? ' is-active' : ''}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => { setIsMobileMenuOpen(false); handleItemClick(); }}
                 >
                   {item.label}
                 </a>
@@ -342,7 +371,6 @@ const PillNav = ({
   );
 };
 
-// Add PropTypes validation
 PillNav.propTypes = {
   logo: PropTypes.string.isRequired,
   logoAlt: PropTypes.string,

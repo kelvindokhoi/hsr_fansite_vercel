@@ -70,3 +70,31 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  :root {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  body {
+    min-width: 280px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 375px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  button {
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+  }
+}

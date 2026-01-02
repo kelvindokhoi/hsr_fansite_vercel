@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../css/UserMenu.css';
 
-function UserMenu({ stellarJadeIcon }) {
+function UserMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -28,14 +28,6 @@ function UserMenu({ stellarJadeIcon }) {
   return (
     <div className="user-menu">
       <span className="username">{user.username}</span>
-      <div className="stellar-jade-container">
-        {stellarJadeIcon ? (
-          <img src={stellarJadeIcon} alt="Stellar Jade" className="stellar-jade-icon" />
-        ) : (
-          <span className="stellar-jade-emoji">💎</span>
-        )}
-        <span className="stellar-jade-amount">{user.stellar_jade_balance}</span>
-      </div>
       <button onClick={handleLogout} className="logout-button">
         Logout
       </button>
