@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import HSRLogo from '../assets/hsr_logo.png';
 import PillNav from '../components/PillNav';
-import GradientText from '../components/GradientText.jsx';
-import DotGrid from '../components/DotGrid.jsx';
-import UserMenu from '../components/UserMenu.jsx';
+import GradientText from '../components/GradientText';
+import DotGrid from '../components/DotGrid';
+import UserMenu from '../components/UserMenu';
 import '../css/About.css';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
 import HSRLogoMarch7 from "../assets/HSR_Logo_March7.png";

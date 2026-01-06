@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import PillNav from '../components/PillNav';
 import { imageQueue } from '../lib/imageQueue';
-import GradientText from '../components/GradientText.jsx';
-import DotGrid from '../components/DotGrid.jsx';
+import GradientText from '../components/GradientText';
+import DotGrid from '../components/DotGrid';
 import '../css/EditCharactersPage.css';
 import HSRLogoMarch7 from "../assets/HSR_Logo_March7.png";
 

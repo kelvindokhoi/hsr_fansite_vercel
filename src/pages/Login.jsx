@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Turnstile from 'react-turnstile';
+import TurnstileModule from 'react-turnstile';
 import { useAuth } from '../context/AuthContext';
+
+// Interop for Turnstile which sometimes imports as an object in production bundles
+const Turnstile = TurnstileModule.Turnstile || TurnstileModule.default || TurnstileModule;
 import HSRLogo from '../assets/hsr_logo.png';
 import HSRLogoCastorice from '../assets/HSR_Logo_Castorice.png'
 import PillNav from '../components/PillNav';
