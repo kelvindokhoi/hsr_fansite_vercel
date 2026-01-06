@@ -42,14 +42,14 @@ function Credits() {
 
       <div className="credits-content">
         <div id="credits-title">
-        <GradientText
-          colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
-          animationSpeed={3}
-          showBorder={false}
-          className="Page-Title"
-        >
-          Credits & Acknowledgments
-        </GradientText>
+          <GradientText
+            colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+            animationSpeed={3}
+            showBorder={false}
+            className="Page-Title"
+          >
+            Credits & Acknowledgments
+          </GradientText>
         </div>
         <div className="credits-text">
           <section className="credits-section">
@@ -100,6 +100,11 @@ function Credits() {
                 <a href="https://letsencrypt.org/" target="_blank" rel="noopener noreferrer">
                   Let's Encrypt
                 </a> - Providing secure SSL certificates via Certbot
+              </li>
+              <li>
+                <a href="https://www.cloudflare.com/products/turnstile/" target="_blank" rel="noopener noreferrer">
+                  Cloudflare Turnstile
+                </a> - Invisible, privacy-focused bot protection
               </li>
             </ul>
           </section>

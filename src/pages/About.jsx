@@ -62,7 +62,8 @@ function About() {
             <li>Interactive character roster with detailed profiles</li>
             <li>Realistic gacha pulling simulation with warp mechanics</li>
             <li>Warp Simulator with visual effects and animations</li>
-            <li>User authentication system</li>
+            <li>User authentication with Cloudflare Turnstile bot protection</li>
+            <li>Optimized image delivery system with automatic format detection</li>
             <li>Responsive design that works on all devices</li>
             <li>Stunning visual effects and animations</li>
           </ul>
@@ -72,7 +73,7 @@ function About() {
             <li><strong>Frontend:</strong> React 18 with Vite, GSAP for animations</li>
             <li><strong>Backend API:</strong> PHP 8.x hosted on Oracle Cloud (Ubuntu VM)</li>
             <li><strong>Database:</strong> Supabase (PostgreSQL) in the cloud</li>
-            <li><strong>Security:</strong> Let's Encrypt SSL (Certbot) via DuckDNS</li>
+            <li><strong>Security:</strong> Cloudflare Turnstile, Let's Encrypt SSL (Certbot)</li>
             <li><strong>State Management:</strong> React Context API</li>
             <li><strong>UI Architecture:</strong> Custom-built responsive components</li>
           </ul>
