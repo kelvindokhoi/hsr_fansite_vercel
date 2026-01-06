@@ -16,9 +16,10 @@
 
 /* Override Page-Title styles for edit characters page */
 .edit-characters-page .Page-Title {
-  margin: 2rem 0 2rem 0 !important;
-  padding: 0 !important;
-  min-height: auto !important;
+  margin: 2rem 0 2rem 0;
+  padding: 0;
+  min-height: auto;
+  margin-top: 3rem;
 }
 
 .loading,
