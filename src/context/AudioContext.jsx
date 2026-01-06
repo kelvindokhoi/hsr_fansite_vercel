@@ -107,7 +107,11 @@ export const AudioProvider = ({ children }) => {
                 }
 
             }).catch(error => {
-                console.error("Audio playback failed:", error);
+                if (error.name === 'AbortError') {
+                    console.warn("Audio playback aborted (standard browser behavior during track switch or user stop).");
+                } else {
+                    console.error("Audio playback failed:", error);
+                }
                 setIsPlaying(false);
             });
         }

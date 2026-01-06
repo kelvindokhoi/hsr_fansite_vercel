@@ -30,40 +30,37 @@ const CharacterCard = ({ character }) => {
   };
 
   const getImagePath = (baseName, type) => {
+    const extensions = ['png', 'jpg', 'webp'];
+    const paths = extensions.map(ext => `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`);
+
     return new Promise((resolve) => {
-      const extensions = ['png', 'jpg'];
-      let currentIndex = 0;
-
-      const tryNext = async () => {
-        if (currentIndex >= extensions.length) {
-          console.log(`No valid image found for ${baseName}_${type}, using fallback`);
-          resolve(getFallbackPath(type));
-          return;
-        }
-
-        const ext = extensions[currentIndex++];
-        const path = `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`;
-
-        try {
+      const loadAttempt = async (path) => {
+        return new Promise((res, rej) => {
           const img = new Image();
-          const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), 5000)
-          );
+          const timeout = setTimeout(() => {
+            img.src = ''; // Cancel loading
+            rej(new Error('timeout'));
+          }, 5000);
 
-          const loadImage = new Promise((resolve, reject) => {
-            img.onload = () => resolve(path);
-            img.onerror = () => reject(new Error('load error'));
-            img.src = path;
-          });
-
-          const result = await Promise.race([loadImage, timeout]);
-          resolve(result);
-        } catch (error) {
-          tryNext();
-        }
+          img.onload = () => {
+            clearTimeout(timeout);
+            res(path);
+          };
+          img.onerror = () => {
+            clearTimeout(timeout);
+            rej(new Error('load error'));
+          };
+          img.src = path;
+        });
       };
 
-      tryNext();
+      // Try all paths in parallel, take the first one that succeeds
+      Promise.any(paths.map(loadAttempt))
+        .then(resolve)
+        .catch(() => {
+          console.log(`No valid image found for ${baseName}_${type}, using fallback`);
+          resolve(getFallbackPath(type));
+        });
     });
   };
 

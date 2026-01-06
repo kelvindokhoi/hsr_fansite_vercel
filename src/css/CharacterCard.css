@@ -40,6 +40,19 @@
   background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
 }
 
+.character-card.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 140px;
+  /* Match grid minimum */
+}
+
 .card-content {
   position: relative;
   height: 100%;
