@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Turnstile from 'react-turnstile';
 import { useAuth } from '../context/AuthContext';
 import HSRLogo from '../assets/hsr_logo.png';
 import HSRLogoCastorice from '../assets/HSR_Logo_Castorice.png'
@@ -16,6 +17,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState(null);
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
@@ -25,9 +27,15 @@ function Login() {
     setError('');
     setLoading(true);
 
+    if (!turnstileToken) {
+      setError('Please complete the security check.');
+      setLoading(false);
+      return;
+    }
+
     const result = isLogin
-      ? await login(username, password)
-      : await register(username, password);
+      ? await login(username, password, turnstileToken)
+      : await register(username, password, turnstileToken);
 
     setLoading(false);
 
@@ -106,6 +114,16 @@ function Login() {
                 required
                 minLength={6}
                 placeholder="Enter password"
+              />
+            </div>
+
+            <div className="turnstile-container" style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+              <Turnstile
+                sitekey="0x4AAAAAAA7y6p4W8A62n89R"
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken(null)}
+                onError={() => setTurnstileToken(null)}
+                theme="dark"
               />
             </div>
 

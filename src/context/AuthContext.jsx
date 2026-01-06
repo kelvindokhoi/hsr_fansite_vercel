@@ -50,12 +50,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (username, password) => {
+  const login = async (username, password, cfToken) => {
     try {
       setError('');
       const response = await axios.post(`${API_URL}/auth/login.php`, {
         username: username.trim(),
-        password: password
+        password: password,
+        cf_token: cfToken
       }, {
         timeout: 10000
       });
@@ -77,11 +78,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, password) => {
+  const register = async (username, password, cfToken) => {
     try {
       const response = await axios.post(`${API_URL}/auth/register.php`, {
         username,
-        password
+        password,
+        cf_token: cfToken
       });
       if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);

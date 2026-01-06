@@ -14,6 +14,42 @@ if (empty($data) || !isset($data->username) || !isset($data->password)) {
     exit();
 }
 
+$cf_token = $data->cf_token ?? null;
+
+function verifyTurnstile($token) {
+    if (!$token) return false;
+    
+    // Get secret key from env
+    $secret = getenv('TURNSTILE_SECRET_KEY');
+    if (!$secret) return true; // Fail open if key is missing to prevent lockout
+    
+    $url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+    $data = [
+        'secret' => $secret,
+        'response' => $token
+    ];
+    
+    $options = [
+        'http' => [
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method'  => 'POST',
+            'content' => http_build_query($data)
+        ]
+    ];
+    
+    $context  = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+    $response = json_decode($result);
+    
+    return $response->success;
+}
+
+if (!verifyTurnstile($cf_token)) {
+    http_response_code(403);
+    echo json_encode(["error" => "Security check failed. Please refresh and try again."]);
+    exit();
+}
+
 $username = trim($data->username);
 $password = $data->password;
 
