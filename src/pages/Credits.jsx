@@ -78,12 +78,38 @@ function Credits() {
           </section>
 
           <section className="credits-section">
+            <h2>Cloud Infrastructure</h2>
+            <ul>
+              <li>
+                <a href="https://www.oracle.com/cloud/" target="_blank" rel="noopener noreferrer">
+                  Oracle Cloud
+                </a> - Hosting for the high-performance PHP backend and asset storage
+              </li>
+              <li>
+                <a href="https://supabase.com/" target="_blank" rel="noopener noreferrer">
+                  Supabase
+                </a> - Cloud-native PostgreSQL database and authentication engine
+              </li>
+              <li>
+                <a href="https://www.duckdns.org/" target="_blank" rel="noopener noreferrer">
+                  DuckDNS
+                </a> - Dynamic DNS service for backend accessibility
+              </li>
+              <li>
+                <a href="https://letsencrypt.org/" target="_blank" rel="noopener noreferrer">
+                  Let's Encrypt
+                </a> - Providing secure SSL certificates via Certbot
+              </li>
+            </ul>
+          </section>
+
+          <section className="credits-section">
             <h2>AI Assistance</h2>
             <p>This project was made possible with the help of the following AI assistants:</p>
             <ul>
-              <li><strong>Windsurf AI</strong> - For code generation and debugging assistance</li>
-              <li><strong>Claude AI</strong> - For project planning and architectural advice</li>
-              <li><strong>Mistral AI</strong> - For creative suggestions and UI/UX improvements</li>
+              <li><strong>Antigravity AI (Google DeepMind)</strong> - Lead backend migration, SSL security integration, and cloud optimization</li>
+              <li><strong>Windsurf AI</strong> - For initial code generation and UI component development</li>
+              <li><strong>Claude AI</strong> - For structural planning and technical advice</li>
             </ul>
           </section>
 

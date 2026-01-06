@@ -69,18 +69,27 @@ function About() {
 
           <h2 className="about-heading">🛠️ Technologies Used</h2>
           <ul>
-            <li><strong>Frontend:</strong> React 18 with Vite</li>
+            <li><strong>Frontend:</strong> React 18 with Vite, GSAP for animations</li>
+            <li><strong>Backend API:</strong> PHP 8.x hosted on Oracle Cloud (Ubuntu VM)</li>
+            <li><strong>Database:</strong> Supabase (PostgreSQL) in the cloud</li>
+            <li><strong>Security:</strong> Let's Encrypt SSL (Certbot) via DuckDNS</li>
             <li><strong>State Management:</strong> React Context API</li>
-            <li><strong>Styling:</strong> CSS Modules, Custom Animations</li>
-            <li><strong>Routing:</strong> React Router v6</li>
-            <li><strong>UI Components:</strong> Custom-built with React</li>
-            <li><strong>Build Tool:</strong> Vite</li>
+            <li><strong>UI Architecture:</strong> Custom-built responsive components</li>
           </ul>
+
+          <h2 className="about-heading">☁️ Cloud Integration</h2>
+          <p>
+            This project has evolved into a robust hybrid cloud application. The frontend is
+            seamlessly deployed on Vercel, while the backend API and high-resolution assets
+            are managed on a dedicated Oracle Cloud instance. Secure data persistence is
+            handled by Supabase, ensuring a safe and lightning-fast experience for all users.
+          </p>
 
           <h2 className="about-heading">🎮 How to Use</h2>
           <p>
             Navigate through the site using the menu above. Explore characters,
-            simulate warps, and experience the gacha system without spending any Stellar Jade!
+            simulate warps, and experience the gacha system—all powered by a
+            modern cloud-native backend!
           </p>
 
           <p style={{ marginTop: '2rem', fontStyle: 'italic', marginBottom: '3rem' }}>

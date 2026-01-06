@@ -1,172 +1,125 @@
-# Honkai: Star Rail Fan Site — Cloud / Production Deployment
+# Honkai: Star Rail Fan Site — Integrated Cloud Evolution
 
-This repository represents the **production, cloud-deployed evolution** of the Honkai: Star Rail Fan Site. It builds upon the original local full-stack implementation and documents the process of migrating the project to a **free-tier, cloud-based architecture**.
+This repository represents the **production-ready, hybrid-cloud evolution** of the Honkai: Star Rail Fan Site. It shifts the project from a local development environment (MAMP/MySQL) to a scalable, secure, and distributed architectural model.
 
 > 📌 **Original (Local MySQL + MAMP) Project:**
 > [https://github.com/kelvindokhoi/hsr_fansite](https://github.com/kelvindokhoi/hsr_fansite)
 
-This README is intentionally written as a **deployment story**, explaining not just *what* to do, but *why* certain architectural decisions were made.
+This version is designed for a live environment, utilizing a distributed stack of free-tier cloud services to provide high availability and secure HTTPS delivery.
 
 ---
 
-## 🌐 Live Architecture Overview
+## 🌐 Hybrid Cloud Architecture
 
-The live version of this project is deployed using the following stack:
+The live application is powered by a coordinated "Triple-Cloud" stack:
 
-* **Vercel** — Frontend hosting (React + Vite)
-* **Oracle Cloud Infrastructure (OCI)** — PHP backend hosting
-* **Supabase (PostgreSQL)** — Cloud-hosted production database
+*   **Vercel** — **Frontend Layer**: Hosts the React + Vite application with automatic HTTPS and edge delivery.
+*   **Oracle Cloud (OCI)** — **Backend Layer**: A dedicated Ubuntu VM running Apache/PHP for the API logic and high-resolution asset storage.
+*   **Supabase (PostgreSQL)** — **Data Layer**: A cloud-hosted PostgreSQL database managing user accounts, gacha balances, and the character roster.
 
-Compared to the original project:
-
-* **MySQL → PostgreSQL**
-* **Local MAMP → Oracle Cloud VM**
-* Minor **PHP and JavaScript adjustments** were required due to structural and SQL differences
-
----
-
-## 📁 Repository Purpose
-
-This repository:
-
-* Contains **production-ready code**
-* Demonstrates how to deploy a full-stack application using **only free-tier services**
-* Complements the original repository by showing how the project scales from local development to cloud production
-
-The original repository focuses on **local setup and development**. This one focuses on **deployment and infrastructure**.
+### Technical Evolution:
+| Feature | Original (Local) | Modern (Cloud) |
+| :--- | :--- | :--- |
+| **Database** | MySQL | PostgreSQL (Supabase) |
+| **API Host** | MAMP (localhost) | Oracle Cloud (Ubuntu VM) |
+| **Asset Storage** | Local folder | Public Webroot on OCI |
+| **Security** | None (HTTP) | Let's Encrypt SSL (HTTPS) |
+| **DNS** | None | DuckDNS (Dynamic DNS) |
 
 ---
 
-## 🖥️ Oracle Cloud Backend Setup (PHP)
+## 🖥️ Backend Infrastructure Setup (OCI + SSL)
 
-### 1️⃣ Create Oracle Cloud Infrastructure Resources
+To replicate this production environment on your own Oracle Cloud instance:
 
-1. Create a **VCN (Virtual Cloud Network)**
-2. Create a **public subnet** inside the VCN
-3. Launch a **Compute Instance (Ubuntu)** and assign it a **public IPv4 address**
+### 1️⃣ Network Configuration (VCN)
+Ensure your Oracle Cloud **Ingress Rules** allow traffic on the following ports:
+*   **Port 80 (HTTP)**: Required for Initial Certbot verification and HTTP traffic.
+*   **Port 443 (HTTPS)**: Required for secure API and asset delivery.
 
-> A public IP is required so the PHP backend can be accessed by the Vercel frontend.
-
----
-
-### 2️⃣ Upload Backend Files to Oracle VM
-
-The PHP backend for the cloud version lives in:
-
-```
-hsrapp_oracle_to_supabase/
-```
-
-Upload this folder to the **Oracle VM home directory** (`~`).
-
-I personally used **WSL2 (Ubuntu 24)** to SCP the files to the server, but **this is not a requirement** — any SSH-capable environment works.
-
----
-
-### 3️⃣ Upload Static Images
-
-Static image assets must be placed in:
-
-```
-/var/www/html/public/images/
-```
-
-This directory is used by the PHP backend and referenced by the frontend for character and UI assets.
-
----
-
-### 4️⃣ Open Required Network Ports
-
-To allow HTTP/HTTPS traffic, configure the VM firewall:
-
+Apply these rules at the OS level (IPtables):
 ```bash
-sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-sudo iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
+sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
 sudo netfilter-persistent save
 ```
 
-Ensure DNS resolution works correctly:
+### 2️⃣ Dynamic DNS & SSL (DuckDNS + Certbot)
+To prevent "Mixed Content" blocks on Vercel (HTTPS), your backend MUST also use HTTPS.
+1.  Set up a free domain at [DuckDNS](https://www.duckdns.org/).
+2.  Install Certbot on your Ubuntu VM:
+    ```bash
+    sudo apt update
+    sudo apt install certbot python3-certbot-apache
+    ```
+3.  Generate your SSL certificate:
+    ```bash
+    sudo certbot --apache -d your-domain.duckdns.org
+    ```
 
-```bash
-echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
-```
-
-> These steps ensure the backend is reachable from the public internet.
+### 3️⃣ File Structure
+Place the production PHP files from `hsrapp_oracle_to_supabase/` into your server's webroot:
+*   **API Logic**: `/var/www/html/hsrapp_oracle_to_supabase/`
+*   **Static Assets**: `/var/www/html/public/images/`
 
 ---
 
 ## ⚙️ Vercel Frontend Configuration
 
-### Environment Variables
+The following **Environment Variables** are required in your Vercel Project Settings for the app to function:
 
-The following environment variables must be configured in **Vercel**:
-
-```env
-IMAGE_UPLOAD_PATH=/var/www/html/public/images/
-VITE_IMAGE_BASE_URL=
-```
-
-* `IMAGE_UPLOAD_PATH` tells the backend where to store image uploads
-* `VITE_IMAGE_BASE_URL` is intentionally left empty to allow flexible asset resolution
+| Variable | Purpose | Example Value |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | Endpoint for the PHP API | `https://your-domain.duckdns.org/hsrapp_oracle_to_supabase/api` |
+| `VITE_IMAGE_BASE_URL` | Base path for cloud-hosted images | `https://your-domain.duckdns.org/public` |
+| `VITE_SUPABASE_URL` | Supabase project URL | `https://xxxx.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Public access key for Supabase | `your-anon-key` |
 
 ---
 
-## 🗄️ Supabase (PostgreSQL) Database Setup
+## 🗄️ Supabase (PostgreSQL) Database Schema
 
-Supabase replaces the local MySQL database used in development.
-
-### Schema Definition
+The production database requires the following schema in the Supabase SQL Editor:
 
 ```sql
-CREATE TABLE public.characters (
-  id INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  rarity INT NOT NULL CHECK (rarity IN (4, 5)),
-  element TEXT NOT NULL CHECK (element IN ('Lightning', 'Wind', 'Quantum', 'Physical', 'Fire', 'Imaginary', 'Ice')),
-  path TEXT NOT NULL CHECK (path IN ('Nihility', 'Remembrance', 'Erudition', 'Hunt', 'Destruction', 'Harmony', 'Preservation', 'Abundance', 'Elation'))
-);
-
+-- Role Management
 CREATE TABLE roles (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   role_name TEXT NOT NULL UNIQUE
 );
 
+INSERT INTO roles (role_name) VALUES ('admin'), ('user');
+
+-- Character Roster
+CREATE TABLE public.characters (
+  id INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  rarity INT NOT NULL CHECK (rarity IN (4, 5)),
+  element TEXT NOT NULL,
+  path TEXT NOT NULL,
+  description TEXT DEFAULT ''
+);
+
+-- User Accounts
 CREATE TABLE users (
   id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT now() NOT NULL,
-  stellar_jade_balance BIGINT NOT NULL DEFAULT 0,
+  stellar_jade_balance BIGINT NOT NULL DEFAULT 1600,
   role_id INT REFERENCES public.roles(id)
 );
-
-INSERT INTO public.roles (role_name) VALUES
-('admin'),
-('user');
 ```
 
-> Passwords are stored as hashes and authentication logic mirrors the original project with PostgreSQL-compatible queries.
+---
+
+## 🔁 Relationship with Original Project
+
+*   **hsr_fansite**: Focuses on **how to build** a full-stack React application.
+*   **hsr_fansite_vercel**: Focuses on **how to deploy and secure** that application in the cloud.
+
+Together, they represent the journey from **Local Prototype** to **Cloud Production**.
 
 ---
 
-## 🔁 Project Relationship
-
-* This repository documents **how the live version was deployed**
-* The original repository documents **how the project was built locally**
-* Both READMEs intentionally **reference each other** to show the full lifecycle of the application
-
-Together, they tell the story of:
-
-> Local Development → Cloud Migration → Production Deployment
-
----
-
-## 🧠 Final Notes
-
-* No secrets are committed to this repository
-* Environment variables are used for all sensitive configuration
-* The architecture is designed to be reproducible using **free-tier services only**
-
----
-
-Made with ❤️ by Kelvin
+Made with ❤️ by Kelvin & Antigravity AI
