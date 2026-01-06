@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import PillNav from '../components/PillNav';
+import { imageQueue } from '../lib/imageQueue';
 import GradientText from '../components/GradientText.jsx';
 import DotGrid from '../components/DotGrid.jsx';
 import '../css/EditCharactersPage.css';
@@ -21,37 +22,39 @@ const getFallbackPath = (type) => {
 };
 
 const getImagePath = (baseName, type) => {
-    const extensions = ['png', 'jpg', 'webp'];
-    const paths = extensions.map(ext => `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`);
+    return imageQueue.add(() => {
+        const extensions = ['png', 'jpg', 'webp'];
+        const paths = extensions.map(ext => `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`);
 
-    return new Promise((resolve) => {
-        const loadAttempt = async (path) => {
-            return new Promise((res, rej) => {
-                const img = new Image();
-                const timeout = setTimeout(() => {
-                    img.src = ''; // Cancel loading
-                    rej(new Error('timeout'));
-                }, 5000);
+        return new Promise((resolve) => {
+            const loadAttempt = async (path) => {
+                return new Promise((res, rej) => {
+                    const img = new Image();
+                    const timeout = setTimeout(() => {
+                        img.src = ''; // Cancel loading
+                        rej(new Error('timeout'));
+                    }, 5000);
 
-                img.onload = () => {
-                    clearTimeout(timeout);
-                    res(path);
-                };
-                img.onerror = () => {
-                    clearTimeout(timeout);
-                    rej(new Error('load error'));
-                };
-                img.src = path;
-            });
-        };
+                    img.onload = () => {
+                        clearTimeout(timeout);
+                        res(path);
+                    };
+                    img.onerror = () => {
+                        clearTimeout(timeout);
+                        rej(new Error('load error'));
+                    };
+                    img.src = path;
+                });
+            };
 
-        // Try all paths in parallel, take the first one that succeeds
-        Promise.any(paths.map(loadAttempt))
-            .then(resolve)
-            .catch(() => {
-                console.log(`No valid image found for ${baseName}_${type}, using fallback`);
-                resolve(getFallbackPath(type));
-            });
+            // Try all paths in parallel, take the first one that succeeds
+            Promise.any(paths.map(loadAttempt))
+                .then(resolve)
+                .catch(() => {
+                    console.log(`No valid image found for ${baseName}_${type}, using fallback`);
+                    resolve(getFallbackPath(type));
+                });
+        });
     });
 };
 
