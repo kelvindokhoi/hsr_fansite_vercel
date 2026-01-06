@@ -136,7 +136,9 @@ try {
             if (!is_dir($imageDir)) {
                 mkdir($imageDir, 0777, true);
             }
-            move_uploaded_file($imageTmpName, $imagePath);
+            if (!move_uploaded_file($imageTmpName, $imagePath)) {
+                error_log("Failed to move uploaded file to $imagePath");
+            }
         }
     } else if ($oldName !== $name) {
         // Rename image if name changed

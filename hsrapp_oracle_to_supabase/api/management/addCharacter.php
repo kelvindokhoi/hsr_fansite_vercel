@@ -155,11 +155,12 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     }
     
     // Move and process image
+    logDebug("Attempting to move file to: " . $imagePath);
     if (move_uploaded_file($imageTmpName, $imagePath)) {
         logDebug("File moved successfully");
     } else {
-        logDebug("Failed to move file", ['tmp' => $imageTmpName, 'dest' => $imagePath]);
-        sendResponse(false, "Failed to move uploaded file");
+        logDebug("Failed to move file", ['tmp' => $imageTmpName, 'dest' => $imagePath, 'perms' => substr(sprintf('%o', fileperms(dirname($imagePath))), -4)]);
+        sendResponse(false, "Failed to move uploaded file. Target path: " . $imagePath);
     }
 }
 

@@ -4,15 +4,23 @@
 // Check environment variable first, then check common Linux path, then use relative fallback
 $env_path = getenv('IMAGE_UPLOAD_PATH');
 $linux_path = '/var/www/html/public/images/';
-$relative_path = realpath(__DIR__ . '/../../../public/images/') . DIRECTORY_SEPARATOR;
+$curr_dir = __DIR__;
+$is_inside_images = (basename($curr_dir) === 'images');
 
 if ($env_path) {
-    define('IMAGE_UPLOAD_PATH', $env_path);
+    $final_path = $env_path;
+} elseif ($is_inside_images) {
+    $final_path = $curr_dir;
 } elseif (is_dir($linux_path)) {
-    define('IMAGE_UPLOAD_PATH', $linux_path);
+    $final_path = $linux_path;
 } else {
-    define('IMAGE_UPLOAD_PATH', $relative_path);
+    // Standard project structure fallback (.../api/management/ -> .../public/images/)
+    $target = realpath(__DIR__ . '/../../../public/images/');
+    $final_path = $target ? $target : __DIR__;
 }
+
+// Ensure it ends with a separator
+define('IMAGE_UPLOAD_PATH', rtrim($final_path, '/\\') . DIRECTORY_SEPARATOR);
 
 // Enable CORS
 header("Access-Control-Allow-Origin: *");
