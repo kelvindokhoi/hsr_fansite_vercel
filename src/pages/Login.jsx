@@ -119,7 +119,7 @@ function Login() {
 
             <div className="turnstile-container" style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
               <Turnstile
-                sitekey="0x4AAAAAAA7y6p4W8A62n89R"
+                sitekey="0x4AAAAAACK7rhYfYI6DZ0ak"
                 onVerify={(token) => setTurnstileToken(token)}
                 onExpire={() => setTurnstileToken(null)}
                 onError={() => setTurnstileToken(null)}
