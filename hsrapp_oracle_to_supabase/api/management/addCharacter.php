@@ -165,13 +165,14 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 
 try {
     // Modified for PostgreSQL with RETURNING id
-    $query = "INSERT INTO characters (name, rarity, element, path) VALUES (:name, :rarity, :element, :path) RETURNING id";
+    $query = "INSERT INTO characters (name, rarity, element, path, description) VALUES (:name, :rarity, :element, :path, :description) RETURNING id";
     $stmt = $db->prepare($query);
 
     $stmt->bindParam(':name', $name);
     $stmt->bindParam(':rarity', $rarity);
     $stmt->bindParam(':element', $element);
     $stmt->bindParam(':path', $path);
+    $stmt->bindParam(':description', $description);
 
     if ($stmt->execute()) {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);

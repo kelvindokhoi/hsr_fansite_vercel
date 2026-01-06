@@ -98,6 +98,7 @@ try {
     $element = $_POST['element'] ?? '';
     $path = $_POST['path'] ?? '';
     $rarity = $_POST['rarity'] ?? 5;
+    $description = $_POST['description'] ?? '';
     
     // Validate required fields
     if (empty($id) || empty($name) || empty($element) || empty($path)) {
@@ -153,12 +154,13 @@ try {
     }
 
     // Update character in database
-    $sql = "UPDATE characters SET name = :name, element = :element, path = :path, rarity = :rarity WHERE id = :id";
+    $sql = "UPDATE characters SET name = :name, element = :element, path = :path, rarity = :rarity, description = :description WHERE id = :id";
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':name', $name);
     $stmt->bindParam(':element', $element);
     $stmt->bindParam(':path', $path);
     $stmt->bindParam(':rarity', $rarity);
+    $stmt->bindParam(':description', $description);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     
     if ($stmt->execute()) {
