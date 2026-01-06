@@ -16,7 +16,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
@@ -40,42 +40,43 @@ function Login() {
 
   return (
     <div className="login-page">
-      <DotGrid 
-        dotSize={2} 
-        gap={15} 
-        baseColor="#5227FF" 
-        activeColor="#5227FF" 
-        proximity={120} 
-        shockRadius={250} 
-        shockStrength={5} 
-        resistance={750} 
+      <DotGrid
+        dotSize={2}
+        gap={15}
+        baseColor="#5227FF"
+        activeColor="#5227FF"
+        proximity={120}
+        shockRadius={250}
+        shockStrength={5}
+        resistance={750}
         returnDuration={1.5}
       />
-      
+
       <PillNav
-        logo={HSRLogoCastorice} 
+        logo={HSRLogoCastorice}
         logoAlt="Honkai: Star Rail Logo"
         items={[
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },
           { label: 'Character List', href: '/character-list' },
+          { label: 'Edit Characters', href: '/edit-characters' },
           { label: 'Gacha Pulling', href: '/gacha-pulling' },
           { label: 'Credits', href: '/credits' }
         ]}
-        activeHref="/login" 
-        className="custom-nav" 
-        baseColor="#753eceff" 
-        pillColor="#ffffff" 
-        hoveredPillTextColor="#ffffff" 
+        activeHref="/login"
+        className="custom-nav"
+        baseColor="#753eceff"
+        pillColor="#ffffff"
+        hoveredPillTextColor="#ffffff"
         pillTextColor="#000000"
       />
-      
+
       <div className="login-container">
         <div className="login-card">
-          <GradientText 
-            colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]} 
-            animationSpeed={3} 
-            showBorder={false} 
+          <GradientText
+            colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+            animationSpeed={3}
+            showBorder={false}
             className="login-title"
           >
             {isLogin ? 'Welcome Back' : 'Create Account'}
@@ -118,7 +119,7 @@ function Login() {
           <div className="toggle-form">
             <p>
               {isLogin ? "Don't have an account? " : "Already have an account? "}
-              <button 
+              <button
                 type="button"
                 onClick={() => {
                   setIsLogin(!isLogin);
