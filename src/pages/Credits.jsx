@@ -41,6 +41,7 @@ function Credits() {
       />
 
       <div className="credits-content">
+        <div id="credits-title">
         <GradientText
           colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
           animationSpeed={3}
@@ -49,7 +50,7 @@ function Credits() {
         >
           Credits & Acknowledgments
         </GradientText>
-
+        </div>
         <div className="credits-text">
           <section className="credits-section">
             <h2>Open Source Projects</h2>
