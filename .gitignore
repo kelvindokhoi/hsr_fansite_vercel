@@ -16,4 +16,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # Main project's code (remove ignore to allow access)
-/hsr_fansite/
+

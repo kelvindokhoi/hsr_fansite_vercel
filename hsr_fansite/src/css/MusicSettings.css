@@ -1,0 +1,228 @@
+/* Main container setup */
+.music-settings-container {
+    position: fixed;
+    left: 2rem;
+    bottom: 2rem;
+    z-index: 900;
+    /* Removed flex to avoid layout shifts */
+    width: 50px;
+    /* Match button width to ensure anchor point */
+    height: 50px;
+    /* Match button height */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* FAB Toggle Button */
+.music-toggle-btn {
+    position: absolute;
+    /* Lock position */
+    left: 0;
+    bottom: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 20;
+    /* Ensure button is above panel slightly if needed, or panel is above */
+}
+
+.music-toggle-btn:hover {
+    background: rgba(30, 30, 40, 0.9);
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(117, 62, 206, 0.4);
+}
+
+.music-toggle-btn.active {
+    background: rgba(117, 62, 206, 0.8);
+    border-color: rgba(117, 62, 206, 0.5);
+    color: white;
+    transform: rotate(90deg);
+    /* Rotate for X effect if using same icon, but we verify we switch icons */
+}
+
+/* Glassmorphism Panel */
+.music-panel {
+    position: absolute;
+    /* Absolute relative to container */
+    bottom: 70px;
+    /* 50px button + 20px gap */
+    left: 0;
+    width: 280px;
+    background: rgba(16, 16, 24, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1.25rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: bottom left;
+    z-index: 10;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Track List */
+.track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Custom Scrollbar for track list */
+.track-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.track-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.track-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.track-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.track-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.track-item.active {
+    background: rgba(117, 62, 206, 0.2);
+    border-color: rgba(117, 62, 206, 0.4);
+    color: #fff;
+    font-weight: 500;
+}
+
+.playing-icon {
+    width: 4px;
+    height: 4px;
+    background: #40ffaa;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #40ffaa;
+}
+
+/* Volume Controls */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.75rem;
+    border-radius: 12px;
+}
+
+.mute-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s;
+}
+
+.mute-btn:hover {
+    color: white;
+}
+
+.volume-slider {
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    transition: transform 0.1s;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}

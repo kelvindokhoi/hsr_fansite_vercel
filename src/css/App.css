@@ -44,10 +44,55 @@
 }
 
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile responsive typography */
+@media (max-width: 768px) {
+    .Page-Title {
+        font-size: 2rem !important;
+        min-height: 60px !important;
+        padding: 0.25rem 1rem !important;
+    }
+
+    .Page-Subtitle {
+        font-size: 16px !important;
+        padding: 0 1rem;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 375px) {
+    .Page-Title {
+        font-size: 1.75rem !important;
+        min-height: 50px !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    .Page-Subtitle {
+        font-size: 14px !important;
+    }
+}
+
+/* Tablet breakpoint */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .Page-Title {
+        font-size: 2.5rem;
+    }
+
+    .Page-Subtitle {
+        font-size: 18px;
+    }
+}
+
+/* App.css */
+.app-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
 }

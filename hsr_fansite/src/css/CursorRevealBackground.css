@@ -1,0 +1,46 @@
+.cursor-reveal-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: white;
+}
+
+.cursor-reveal-bg {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cursor-reveal-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cursor-reveal-content {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cursor-reveal-content > * {
+  pointer-events: auto;
+}
+
+/* Mobile: just show dim background */
+@media (pointer: coarse) {
+  .cursor-reveal-bg {
+    filter: brightness(0.4);
+  }
+  .cursor-reveal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
