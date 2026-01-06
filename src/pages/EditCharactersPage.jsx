@@ -39,7 +39,7 @@ const getImagePath = (baseName, type) => {
             try {
                 const img = new Image();
                 const timeout = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('timeout')), 1000)
+                    setTimeout(() => reject(new Error('timeout')), 5000)
                 );
 
                 const loadImage = new Promise((resolve, reject) => {
