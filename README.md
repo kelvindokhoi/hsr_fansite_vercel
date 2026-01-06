@@ -24,6 +24,7 @@ The live application is powered by a coordinated "Triple-Cloud" stack:
 | **API Host** | MAMP (localhost) | Oracle Cloud (Ubuntu VM) |
 | **Asset Storage** | Local folder | Public Webroot on OCI |
 | **Security** | None (HTTP) | Let's Encrypt SSL (HTTPS) |
+| **Anti-Bot** | None | Cloudflare Turnstile (Invisible CAPTCHA) |
 | **DNS** | None | DuckDNS (Dynamic DNS) |
 
 ---
@@ -57,7 +58,16 @@ To prevent "Mixed Content" blocks on Vercel (HTTPS), your backend MUST also use 
     sudo certbot --apache -d your-domain.duckdns.org
     ```
 
-### 3️⃣ File Structure
+### 3️⃣ Bot Protection (Cloudflare Turnstile)
+To protect your login and registration endpoints:
+1.  Create a **Turnstile Widget** in your Cloudflare dashboard.
+2.  Add your **Secret Key** to the backend `.env` file on your OCI VM:
+    ```bash
+    # /var/www/html/hsrapp_oracle_to_supabase/.env
+    TURNSTILE_SECRET_KEY=your_secret_key_here
+    ```
+
+### 4️⃣ File Structure
 Place the production PHP files from `hsrapp_oracle_to_supabase/` into your server's webroot:
 *   **API Logic**: `/var/www/html/hsrapp_oracle_to_supabase/`
 *   **Static Assets**: `/var/www/html/public/images/`
@@ -97,7 +107,8 @@ CREATE TABLE public.characters (
   rarity INT NOT NULL CHECK (rarity IN (4, 5)),
   element TEXT NOT NULL,
   path TEXT NOT NULL,
-  description TEXT DEFAULT ''
+  description TEXT DEFAULT '',
+  image_extension TEXT DEFAULT 'png'
 );
 
 -- User Accounts
