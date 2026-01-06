@@ -252,6 +252,9 @@ const EditCharactersPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        console.log('--- Starting Character Upload ---');
+        console.log('Form Data:', formData);
 
         const data = new FormData();
         Object.keys(formData).forEach(key => {
@@ -262,6 +265,7 @@ const EditCharactersPage = () => {
 
         if (editingCharacter) {
             data.append('id', editingCharacter.id);
+            console.log('Editing existing character ID:', editingCharacter.id);
         }
 
         try {
@@ -270,6 +274,7 @@ const EditCharactersPage = () => {
                 ? `${API_URL}/management/update_character.php`
                 : `${API_URL}/management/addCharacter.php`;
 
+            console.log('Target URL:', url);
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -278,17 +283,31 @@ const EditCharactersPage = () => {
                 body: data
             });
 
-            const result = await response.json();
+            const text = await response.text();
+            console.log('Raw Server Response:', text);
+
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (e) {
+                console.error('Failed to parse JSON response');
+                setError('Server returned invalid data format.');
+                return;
+            }
 
             if (result.success) {
+                console.log('Upload Successful!', result);
                 await fetchCharacters();
                 resetForm();
             } else {
+                console.error('Upload Failed:', result.message);
                 setError(result.message || 'Operation failed');
             }
         } catch (err) {
+            console.error('Network/Connection Error:', err);
             setError('Error connecting to server');
         }
+        console.log('--- End Upload Process ---');
     };
 
     const handleDelete = async (id) => {

@@ -1,8 +1,19 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:5173");
+// Dynamic CORS handling
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    $origin = $_SERVER['HTTP_ORIGIN'];
+    // Allow localhost and vercel domains
+    if (strpos($origin, 'localhost') !== false || strpos($origin, 'vercel.app') !== false) {
+        header("Access-Control-Allow-Origin: $origin");
+        header('Access-Control-Allow-Credentials: true');
+    }
+} else {
+    // Fallback if no origin is sent
+    header("Access-Control-Allow-Origin: *");
+}
+
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Content-Type: application/json');
 
 // Handle preflight requests

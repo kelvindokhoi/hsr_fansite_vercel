@@ -22,14 +22,5 @@ if ($env_path) {
 // Ensure it ends with a separator
 define('IMAGE_UPLOAD_PATH', rtrim($final_path, '/\\') . DIRECTORY_SEPARATOR);
 
-// Enable CORS
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+// Image upload path is now defined as IMAGE_UPLOAD_PATH
 ?>

@@ -2,7 +2,7 @@
 node_modules
 
 # Sensitive data
-# .env
+.env
 /hsrapp_oracle_to_supabase/.env
 
 # Production

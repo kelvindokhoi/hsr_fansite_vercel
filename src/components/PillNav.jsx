@@ -64,7 +64,7 @@ const PillNav = ({
   useEffect(() => {
     const layout = () => {
       circleRefs.current.forEach(circle => {
-        if (!circle?.parentElement) return;
+        if (!circle || !circle.parentElement) return;
         const pill = circle.parentElement;
         const rect = pill.getBoundingClientRect();
         const { width: w, height: h } = rect;

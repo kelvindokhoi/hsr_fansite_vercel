@@ -1,15 +1,5 @@
 <?php
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+require_once '../../config/database.php';
 
 // Get token from Authorization header
 $headers = getallheaders();
@@ -24,8 +14,6 @@ if (empty($authorization)) {
 }
 
 $token = str_replace('Bearer ', '', $authorization);
-
-require_once '../../config/database.php';
 
 // Create connection
 $database = new Database();
@@ -70,7 +58,7 @@ try {
 }
 
 // Query to get all characters with their details
-$sql = "SELECT id, name, rarity, element, path FROM characters ORDER BY name";
+$sql = "SELECT id, name, rarity, element, path, description FROM characters ORDER BY name";
 $stmt = $db->prepare($sql);
 $stmt->execute();
 
@@ -83,7 +71,7 @@ if ($stmt->rowCount() > 0) {
             'rarity' => (int)$row['rarity'],
             'element' => $row['element'],
             'path' => $row['path'],
-            'description' => "",
+            'description' => $row['description'] ?? "",
             'imageName' => str_replace(' ', '_', $row['name'])
         ];
     }
