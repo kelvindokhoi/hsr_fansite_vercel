@@ -31,6 +31,12 @@ const CharacterCard = ({ character }) => {
   };
 
   const getImagePath = (baseName, type) => {
+    // If we have the specific extension from the DB, use it directly (MUCH FASTER)
+    if (character.imageExtension) {
+      const ext = character.imageExtension;
+      return `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`;
+    }
+
     return imageQueue.add(() => {
       const extensions = ['png', 'jpg', 'webp'];
       const paths = extensions.map(ext => `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`);

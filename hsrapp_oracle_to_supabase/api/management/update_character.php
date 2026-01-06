@@ -107,18 +107,9 @@ try {
     }
     
     // Check if character exists and get current name for potential image renaming
-    $checkSql = "SELECT id, name FROM characters WHERE id = :id";
-    $checkStmt = $db->prepare($checkSql);
-    $checkStmt->bindParam(':id', $id, PDO::PARAM_INT);
-    $checkStmt->execute();
-    
-    if ($checkStmt->rowCount() === 0) {
-        echo json_encode(['success' => false, 'message' => 'Character not found']);
-        exit();
-    }
-    
     $currentCharacter = $checkStmt->fetch(PDO::FETCH_ASSOC);
     $oldName = $currentCharacter['name'];
+    $currentExt = $currentCharacter['image_extension'] ?? 'png';
 
     // Handle image upload (optional)
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -129,7 +120,11 @@ try {
         
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (in_array($imageType, $allowedTypes)) {
-            $imageName = str_replace(' ', '_', $name) . '_portrait.png';
+            $ext = pathinfo($imageFile['name'], PATHINFO_EXTENSION) ?: 'png';
+            if (strtolower($ext) === 'jpeg') $ext = 'jpg';
+            $currentExt = $ext;
+            
+            $imageName = str_replace(' ', '_', $name) . '_portrait.' . $currentExt;
             $imagePath = IMAGE_UPLOAD_PATH . $imageName;
             
             $imageDir = dirname($imagePath);
@@ -141,28 +136,35 @@ try {
             }
         }
     } else if ($oldName !== $name) {
-        // Rename image if name changed
-        $extensions = ['.png', '.jpg'];
-        $oldBase = str_replace(' ', '_', $oldName) . '_portrait';
-        $newBase = str_replace(' ', '_', $name) . '_portrait';
+        // Rename image if name changed - use the known extension
+        $oldPath = IMAGE_UPLOAD_PATH . str_replace(' ', '_', $oldName) . '_portrait.' . $currentExt;
+        $newPath = IMAGE_UPLOAD_PATH . str_replace(' ', '_', $name) . '_portrait.' . $currentExt;
         
-        foreach ($extensions as $ext) {
-            $oldPath = IMAGE_UPLOAD_PATH . $oldBase . $ext;
-            $newPath = IMAGE_UPLOAD_PATH . $newBase . $ext;
-            if (file_exists($oldPath)) {
-                rename($oldPath, $newPath);
+        if (file_exists($oldPath)) {
+            rename($oldPath, $newPath);
+        } else {
+            // Fallback: search for potential files if DB was out of sync
+            foreach (['png', 'jpg', 'webp'] as $fe) {
+                $oldP = IMAGE_UPLOAD_PATH . str_replace(' ', '_', $oldName) . '_portrait.' . $fe;
+                $newP = IMAGE_UPLOAD_PATH . str_replace(' ', '_', $name) . '_portrait.' . $fe;
+                if (file_exists($oldP)) {
+                    rename($oldP, $newP);
+                    $currentExt = $fe;
+                    break;
+                }
             }
         }
     }
 
     // Update character in database
-    $sql = "UPDATE characters SET name = :name, element = :element, path = :path, rarity = :rarity, description = :description WHERE id = :id";
+    $sql = "UPDATE characters SET name = :name, element = :element, path = :path, rarity = :rarity, description = :description, image_extension = :image_extension WHERE id = :id";
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':name', $name);
     $stmt->bindParam(':element', $element);
     $stmt->bindParam(':path', $path);
     $stmt->bindParam(':rarity', $rarity);
     $stmt->bindParam(':description', $description);
+    $stmt->bindParam(':image_extension', $currentExt);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     
     if ($stmt->execute()) {

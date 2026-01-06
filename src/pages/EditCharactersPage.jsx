@@ -21,7 +21,12 @@ const getFallbackPath = (type) => {
     }
 };
 
-const getImagePath = (baseName, type) => {
+const getImagePath = (baseName, type, extension = null) => {
+    // If we have the specific extension from the DB, use it directly
+    if (extension) {
+        return `${IMAGE_BASE_URL}/images/${baseName}_${type}.${extension}`;
+    }
+
     return imageQueue.add(() => {
         const extensions = ['png', 'jpg', 'webp'];
         const paths = extensions.map(ext => `${IMAGE_BASE_URL}/images/${baseName}_${type}.${ext}`);
@@ -72,7 +77,7 @@ const CharacterCard = ({ character, onEdit, onDelete }) => {
                 setIsLoading(true);
                 const imageName = character.imageName || character.name.replace(/\s+/g, '_');
                 const [portrait] = await Promise.all([
-                    getImagePath(imageName, 'portrait')
+                    getImagePath(imageName, 'portrait', character.imageExtension)
                 ]);
 
                 if (isMounted) {

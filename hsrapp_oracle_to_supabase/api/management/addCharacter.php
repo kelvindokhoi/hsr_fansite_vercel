@@ -141,8 +141,13 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         sendResponse(false, "Image size too large. Maximum 5MB allowed");
     }
     
-    // Generate image name based on character name (always png)
-    $imageName = str_replace(' ', '_', $name) . '_portrait.png';
+    // Detect extension from original filename
+    $ext = pathinfo($imageFile['name'], PATHINFO_EXTENSION) ?: 'png';
+    // Clean up extension (e.g. jpeg -> jpg)
+    if (strtolower($ext) === 'jpeg') $ext = 'jpg';
+    
+    // Generate image name based on character name and actual extension
+    $imageName = str_replace(' ', '_', $name) . '_portrait.' . $ext;
     $imagePath = IMAGE_UPLOAD_PATH . $imageName;
     
     // Create directory if it doesn't exist
@@ -165,8 +170,9 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 }
 
 try {
+    $extension = isset($ext) ? $ext : 'png';
     // Modified for PostgreSQL with RETURNING id
-    $query = "INSERT INTO characters (name, rarity, element, path, description) VALUES (:name, :rarity, :element, :path, :description) RETURNING id";
+    $query = "INSERT INTO characters (name, rarity, element, path, description, image_extension) VALUES (:name, :rarity, :element, :path, :description, :image_extension) RETURNING id";
     $stmt = $db->prepare($query);
 
     $stmt->bindParam(':name', $name);
@@ -174,6 +180,7 @@ try {
     $stmt->bindParam(':element', $element);
     $stmt->bindParam(':path', $path);
     $stmt->bindParam(':description', $description);
+    $stmt->bindParam(':image_extension', $extension);
 
     if ($stmt->execute()) {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);

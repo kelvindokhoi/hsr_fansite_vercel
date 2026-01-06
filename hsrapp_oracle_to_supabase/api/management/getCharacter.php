@@ -58,7 +58,7 @@ try {
 }
 
 // Query to get all characters with their details
-$sql = "SELECT id, name, rarity, element, path, description FROM characters ORDER BY name";
+$sql = "SELECT id, name, rarity, element, path, description, image_extension FROM characters ORDER BY name";
 $stmt = $db->prepare($sql);
 $stmt->execute();
 
@@ -72,6 +72,7 @@ if ($stmt->rowCount() > 0) {
             'element' => $row['element'],
             'path' => $row['path'],
             'description' => $row['description'] ?? "",
+            'imageExtension' => $row['image_extension'] ?? 'png',
             'imageName' => str_replace(' ', '_', $row['name'])
         ];
     }
