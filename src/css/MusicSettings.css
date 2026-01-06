@@ -4,8 +4,8 @@
     left: 2rem;
     bottom: 2rem;
     z-index: 900;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -14,8 +14,8 @@
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: rgba(20, 20, 30, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -29,6 +29,11 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     z-index: 20;
+}
+
+.music-toggle-btn svg {
+    width: 32px;
+    height: 32px;
 }
 
 .music-toggle-btn:hover {
@@ -48,7 +53,7 @@
 /* Glassmorphism Panel */
 .music-panel {
     position: absolute;
-    bottom: 70px;
+    bottom: 80px;
     left: 0;
     width: 280px;
     background: rgba(16, 16, 24, 0.85);
@@ -68,6 +73,7 @@
         opacity: 0;
         transform: translateY(20px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -192,6 +198,7 @@
 .volume-slider {
     flex: 1;
     -webkit-appearance: none;
+    appearance: none;
     height: 4px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
@@ -200,6 +207,7 @@
 
 .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     width: 12px;
     height: 12px;
     background: white;
@@ -219,7 +227,7 @@
         left: 1rem;
         bottom: 1rem;
     }
-    
+
     .music-panel {
         width: 260px;
         left: -100px;
