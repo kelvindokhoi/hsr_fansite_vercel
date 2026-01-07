@@ -558,9 +558,15 @@
 }
 
 .character-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(64, 255, 170, 0.2);
   z-index: 10;
+}
+
+.character-card.five-star:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(255, 215, 0, 0.3);
 }
 
 .character-card.four-star {

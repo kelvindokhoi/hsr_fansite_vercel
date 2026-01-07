@@ -172,16 +172,21 @@ const CharacterCard = ({ character }) => {
             </div>
           </div>
 
-          <div className="tooltip-details">
-            <img
-              src={elementPath}
-              alt={`${character.element} element`}
-              className="tooltip-element"
-              onError={(e) => {
-                e.target.src = `${IMAGE_BASE_URL}/images/Unknown.png`;
-              }}
-            />
-            <span className="tooltip-path-text">{character.path}</span>
+          <div className="tooltip-details-row">
+            <div className="tooltip-pill element-pill">
+              <img
+                src={elementPath}
+                alt={`${character.element} element`}
+                className="tooltip-element"
+                onError={(e) => {
+                  e.target.src = `${IMAGE_BASE_URL}/images/Unknown.png`;
+                }}
+              />
+              <span className="tooltip-pill-text">{character.element}</span>
+            </div>
+            <div className="tooltip-pill path-pill">
+              <span className="tooltip-pill-text">{character.path}</span>
+            </div>
           </div>
 
           <div className="tooltip-description">
