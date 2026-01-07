@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import HSRLogo from '../assets/hsr_logo.png';
 import PillNav from '../components/PillNav';
 import GradientText from '../components/GradientText.jsx';
 import DotGrid from '../components/DotGrid.jsx';
 import UserMenu from '../components/UserMenu.jsx';
 import '../css/Home.css';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
-import HSRLogoKafka from "../assets/HSR_Logo_Kafka.png";
 
 function Home() {
   return (
@@ -24,8 +22,6 @@ function Home() {
       </div>
 
       <PillNav
-        logo={HSRLogoKafka}
-        logoAlt="Honkai: Star Rail Logo"
         items={[
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },

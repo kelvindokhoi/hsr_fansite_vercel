@@ -29,6 +29,8 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     z-index: 20;
+    padding: 0;
+    overflow: hidden;
 }
 
 .music-toggle-btn svg {
@@ -47,7 +49,34 @@
     background: rgba(117, 62, 206, 0.8);
     border-color: rgba(117, 62, 206, 0.5);
     color: white;
-    transform: rotate(90deg);
+}
+
+.logo-toggle-wrapper {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.spinning-logo-toggle {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    animation: slowSpin 8s linear infinite;
+}
+
+@keyframes slowSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Glassmorphism Panel */

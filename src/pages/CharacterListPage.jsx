@@ -5,7 +5,6 @@ import CharacterList from '../components/CharacterList';
 import GradientText from '../components/GradientText';
 import UserMenu from '../components/UserMenu';
 import { useAuth } from '../context/AuthContext';
-import HSRLogoEvernight from '../assets/HSR_Logo_Evernight.png';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
 import '../css/CharacterListPage.css';
 
@@ -106,8 +105,6 @@ const CharacterListPage = () => {
   return (
     <div className="page-container">
       <PillNav
-        logo={HSRLogoEvernight}
-        logoAlt="Honkai: Star Rail Logo"
         items={navItems}
         activeHref="/character-list"
         baseColor="#753eceff"

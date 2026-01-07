@@ -17,7 +17,7 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-W
 header('Content-Type: application/json');
 
 // Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
@@ -44,9 +44,21 @@ class Database {
         if (!file_exists($path)) return;
         $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         foreach ($lines as $line) {
-            if (strpos(trim($line), '#') === 0) continue;
+            $line = trim($line);
+            if (empty($line) || strpos($line, '#') === 0) continue;
+            if (strpos($line, '=') === false) continue;
+            
             list($name, $value) = explode('=', $line, 2);
-            putenv(trim($name) . "=" . trim($value));
+            $name = trim($name);
+            $value = trim($value);
+            
+            // Remove optional quotes from the value
+            if (preg_match('/^["\'](.*)["\']$/', $value, $matches)) {
+                $value = $matches[1];
+            }
+            
+            putenv("$name=$value");
+            $_ENV[$name] = $value; // Also set in $_ENV for good measure
         }
     }
 
@@ -54,14 +66,19 @@ class Database {
         $this->conn = null;
 
         try {
+            // Check if PostgreSQL driver is installed
+            if (!extension_loaded('pdo_pgsql')) {
+                throw new PDOException("PHP extension 'pdo_pgsql' is not installed or enabled on this server. Please install it (e.g., 'sudo apt install php-pgsql') and restart Apache.");
+            }
+            
             $dsn = "pgsql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->dbname;
             $this->conn = new PDO($dsn, $this->user, $this->pass);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            // PostgreSQL default characterset is usually UTF8, but good to be explicit if needed
-            // $this->conn->exec("SET NAMES 'UTF8'");
         } catch(PDOException $exception) {
-            error_log("Connection error: " . $exception->getMessage());
+            // Log full error for the server admin
+            error_log("Supabase Connection Error: " . $exception->getMessage());
+            // Rethrow or handle based on how you want the API to respond
+            throw new Exception("Database connection failed: " . $exception->getMessage());
         }
 
         return $this->conn;

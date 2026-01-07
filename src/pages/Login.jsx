@@ -5,8 +5,6 @@ import { useAuth } from '../context/AuthContext';
 
 // Interop for Turnstile which sometimes imports as an object in production bundles
 const Turnstile = TurnstileModule.Turnstile || TurnstileModule.default || TurnstileModule;
-import HSRLogo from '../assets/hsr_logo.png';
-import HSRLogoCastorice from '../assets/HSR_Logo_Castorice.png'
 import PillNav from '../components/PillNav';
 import GradientText from '../components/GradientText';
 import DotGrid from '../components/DotGrid';
@@ -64,8 +62,6 @@ function Login() {
       />
 
       <PillNav
-        logo={HSRLogoCastorice}
-        logoAlt="Honkai: Star Rail Logo"
         items={[
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },

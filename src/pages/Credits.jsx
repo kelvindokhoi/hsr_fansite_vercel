@@ -3,8 +3,6 @@ import GradientText from '../components/GradientText';
 import DotGrid from '../components/DotGrid';
 import UserMenu from '../components/UserMenu';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
-import HSRLogoRobin from '../assets/HSR_Logo_Robin1.png'
-import HSRLogoMarch7 from "../assets/HSR_Logo_March7.png";
 import PillNav from '../components/PillNav';
 import '../css/Credits.css';
 
@@ -22,8 +20,6 @@ function Credits() {
       />
 
       <PillNav
-        logo={HSRLogoRobin}
-        logoAlt="Honkai: Star Rail Logo"
         items={[
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },

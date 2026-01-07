@@ -3,8 +3,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PillNav from '../components/PillNav';
 import GradientText from '../components/GradientText';
-import HSRLogoKafka from '../assets/HSR_Logo_Kafka.png';
-import HSRLogoPomPom from '../assets/HSR_Logo_PomPom.png';
 import StellarJadePNG from '../assets/Item_Stellar_Jade.png';
 import '../css/WarpSimulator.css';
 
@@ -36,8 +34,6 @@ const WarpSimulator = () => {
   return (
     <div className="warp-simulator-page">
       <PillNav
-        logo={HSRLogoPomPom}
-        logoAlt="Honkai: Star Rail Logo"
         items={[
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },
