@@ -64,6 +64,7 @@
     padding: 0 0.5rem;
   }
 
+
   .pill-nav-container {
     padding: 5px 0;
     position: fixed;
@@ -223,13 +224,30 @@
     right: 0.75rem;
   }
 
-  /* Improved mobile menu links */
   .mobile-menu-popover .mobile-menu-link {
     padding: 14px 18px;
-    font-size: 15px;
-    min-height: 44px;
+    font-size: 16px;
+    min-height: 48px;
     display: flex;
     align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .mobile-menu-popover .mobile-menu-link:active,
+  .mobile-menu-popover .mobile-menu-link.is-active {
+    background: var(--base);
+    color: #fff;
+    border-color: var(--base);
+    box-shadow: 0 0 15px rgba(var(--base-rgb), 0.4);
   }
 
   .mobile-menu-popover .mobile-menu-link.is-active {
@@ -281,41 +299,36 @@
   top: 3em;
   left: 1rem;
   right: 1rem;
-  background: var(--base, #f0f0f0);
-  border-radius: 27px;
-  box-shadow: 0 8px 32px rgba(14, 49, 114, 0.12);
-  z-index: 998;
+  background: rgba(6, 0, 16, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
   opacity: 0;
+  transform: translateY(10px);
   transform-origin: top center;
-  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mobile-menu-popover.is-open {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto;
+  visibility: visible !important;
 }
 
 .mobile-menu-list {
   list-style: none;
   margin: 0;
-  padding: 3px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
 }
 
-.mobile-menu-popover .mobile-menu-link {
-  display: block;
-  padding: 12px 16px;
-  color: var(--pill-text, #fff);
-  background-color: var(--pill-bg, #fff);
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: 50px;
-  transition: all 0.2s ease;
-}
-
-.mobile-menu-popover .mobile-menu-link:hover {
-  cursor: pointer;
-  background-color: var(--base);
-  color: var(--hover-text, #fff);
-}
 
 /* Very small screens (iPhone SE and similar) */
 @media (max-width: 375px) {

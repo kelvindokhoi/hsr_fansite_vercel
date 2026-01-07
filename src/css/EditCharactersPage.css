@@ -64,6 +64,19 @@
   max-width: 600px;
 }
 
+@media (min-width: 1440px) {
+  .edit-characters-container {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .edit-characters-container {
+    max-width: 1400px;
+    grid-template-columns: 400px 1fr;
+  }
+}
+
 .edit-characters-container {
   display: grid;
   grid-template-columns: 1fr 2fr;

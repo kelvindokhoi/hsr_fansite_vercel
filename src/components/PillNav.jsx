@@ -181,31 +181,9 @@ const PillNav = ({
 
     if (menu) {
       if (newState) {
-        gsap.set(menu, { visibility: 'visible' });
-        gsap.fromTo(
-          menu,
-          { opacity: 0, y: 10, scaleY: 1 },
-          {
-            opacity: 1,
-            y: 0,
-            scaleY: 1,
-            duration: 0.3,
-            ease,
-            transformOrigin: 'top center'
-          }
-        );
+        menu.classList.add('is-open');
       } else {
-        gsap.to(menu, {
-          opacity: 0,
-          y: 10,
-          scaleY: 1,
-          duration: 0.2,
-          ease,
-          transformOrigin: 'top center',
-          onComplete: () => {
-            gsap.set(menu, { visibility: 'hidden' });
-          }
-        });
+        menu.classList.remove('is-open');
       }
     }
     onMobileMenuClick?.();

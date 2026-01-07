@@ -42,7 +42,7 @@ const WarpSimulator = () => {
           { label: 'Gacha Pulling', href: '/gacha-pulling' },
           { label: 'Credits', href: '/credits' }
         ]}
-        activeHref="/warp-simulator"
+        activeHref="/gacha-pulling"
         baseColor="#753eceff"
         pillColor="#ffffff"
         hoveredPillTextColor="#ffffff"

@@ -66,8 +66,6 @@ const CharacterListPage = () => {
     return (
       <div className="page-container">
         <PillNav
-          logo={HSRLogoEvernight}
-          logoAlt="Honkai: Star Rail Logo"
           items={navItems}
           activeHref="/character-list"
           baseColor="#753eceff"
@@ -84,8 +82,6 @@ const CharacterListPage = () => {
     return (
       <div className="page-container">
         <PillNav
-          logo={HSRLogoEvernight}
-          logoAlt="Honkai: Star Rail Logo"
           items={navItems}
           activeHref="/character-list"
           baseColor="#753eceff"

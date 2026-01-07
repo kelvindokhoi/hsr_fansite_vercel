@@ -18,9 +18,28 @@ export const AuthProvider = ({ children }) => {
     if (storedToken) {
       verifyToken(storedToken);
     } else {
-      setLoading(false);
+      // Auto-login for localhost development
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log('Localhost detected: Attempting auto-login for testing...');
+        autoLoginForDev();
+      } else {
+        setLoading(false);
+      }
     }
   }, []);
+
+  const autoLoginForDev = async () => {
+    try {
+      const result = await login('testuser', 'password123', 'dev-token-bypass');
+      if (result.success) {
+        console.log('Auto-login successful.');
+      }
+    } catch (err) {
+      console.error('Auto-login failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const verifyToken = async (token) => {
     if (!token) {

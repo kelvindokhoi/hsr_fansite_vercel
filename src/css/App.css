@@ -1,4 +1,16 @@
-/* Shared styles only */
+/* Global reset and foundational styles */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    width: 100%;
+}
+
 .Page-Title {
     font-size: 3rem;
     z-index: 1;
@@ -55,9 +67,10 @@ body {
 /* Mobile responsive typography */
 @media (max-width: 768px) {
     .Page-Title {
-        font-size: 2rem !important;
-        min-height: 60px !important;
-        padding: 0.25rem 1rem !important;
+        font-size: clamp(1.5rem, 8vw, 2.5rem) !important;
+        min-height: auto !important;
+        padding: 0.5rem 1rem !important;
+        line-height: 1.2;
     }
 
     .Page-Subtitle {
@@ -95,4 +108,34 @@ body {
     position: relative;
     min-height: 100vh;
     width: 100%;
+}
+
+/* Desktop optimizations */
+@media (min-width: 1440px) {
+    .Page-Title {
+        font-size: 4.5rem !important;
+        margin-top: 4rem;
+        margin-bottom: 2rem;
+    }
+
+    .Page-Subtitle {
+        font-size: 24px;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 1200px) {
+    .Page-Title {
+        font-size: 4rem;
+        margin-top: 3rem;
+    }
+
+    .Page-Subtitle {
+        font-size: 22px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }

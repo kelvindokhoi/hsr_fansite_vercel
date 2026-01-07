@@ -135,3 +135,29 @@
 .toggle-button:hover {
     color: #4079ff;
 }
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1rem;
+    }
+
+    .login-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .login-title {
+        font-size: 24px !important;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group input {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .submit-button {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
